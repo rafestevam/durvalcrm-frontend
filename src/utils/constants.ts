@@ -48,14 +48,16 @@ export const API_ENDPOINTS = {
     SEARCH: '/associados/search',
   },
   
-  // Mensalidades
+  // Mensalidades - CORRIGIDO para corresponder ao backend
   MENSALIDADES: {
     LIST: '/mensalidades',
     CREATE: '/mensalidades',
     GET: (id: string) => `/mensalidades/${id}`,
     UPDATE: (id: string) => `/mensalidades/${id}`,
     DELETE: (id: string) => `/mensalidades/${id}`,
-    GERAR_COBRANCAS: '/mensalidades/gerar-cobrancas',
+    RESUMO: '/mensalidades/resumo', // ADICIONADO
+    GERAR_COBRANCAS: '/mensalidades/gerar', // CORRIGIDO - era /mensalidades/gerar-cobrancas
+    QRCODE: (id: string) => `/mensalidades/${id}/qrcode`, // ADICIONADO
   },
   
   // Vendas
