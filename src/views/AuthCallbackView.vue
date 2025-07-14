@@ -1,3 +1,5 @@
+<!-- src/views/AuthCallbackView.vue - Versão corrigida -->
+
 <template>
   <div class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
@@ -125,12 +127,47 @@ async function handleAuthCallback() {
     
     console.log('Processando código de autorização...', { code: code.substring(0, 10) + '...' })
     
-    // Processar callback através do AuthService
+    // CORREÇÃO: Processar callback através do AuthService
     const success = await authService.handleCallback(code, window.location.origin + '/auth/callback')
     
     if (success) {
-      // Redirecionar para dashboard
-      await router.push(ROUTES.DASHBOARD)
+      console.log('Callback processado com sucesso, aguardando propagação do token...')
+      
+      // CORREÇÃO: Aguardar um pouco para garantir que os tokens estejam disponíveis
+      await new Promise(resolve => setTimeout(resolve, 200))
+      
+      // CORREÇÃO: Buscar informações do usuário diretamente após obter o token
+      try {
+        const userInfo = await authService.getUserInfo()
+        console.log('Informações do usuário obtidas:', userInfo)
+        
+        // Usar método específico do store para callback
+        const loginSuccess = await authStore.handleAuthCallback(
+          authService.getStoredToken()!,
+          userInfo
+        )
+        
+        if (loginSuccess) {
+          console.log('Login processado com sucesso, redirecionando...')
+          await router.push(ROUTES.DASHBOARD)
+        } else {
+          throw new Error('Falha no processamento final da autenticação')
+        }
+      } catch (userInfoError) {
+        console.error('Erro ao obter informações do usuário:', userInfoError)
+        
+        // Tentar login mesmo sem informações do usuário completas
+        const loginSuccess = await authStore.handleAuthCallback(
+          authService.getStoredToken()!
+        )
+        
+        if (loginSuccess) {
+          console.log('Login processado com sucesso (sem user info), redirecionando...')
+          await router.push(ROUTES.DASHBOARD)
+        } else {
+          throw new Error('Falha no processamento da autenticação')
+        }
+      }
     } else {
       throw new Error('Falha no processamento do código de autorização')
     }

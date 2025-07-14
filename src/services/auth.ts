@@ -1,3 +1,5 @@
+// src/services/auth.ts - Versão corrigida
+
 import apiService from './api'
 
 export interface LoginInfo {
@@ -80,65 +82,50 @@ export class AuthService {
       // Gerar PKCE parameters
       const codeVerifier = this.generateCodeVerifier()
       const codeChallenge = await this.generateCodeChallenge(codeVerifier)
-      
-      // Usar a URL atual da aplicação como base
-      const currentOrigin = window.location.origin
-      const redirectUri = `${currentOrigin}/auth/callback`
       const state = this.generateState()
       
-      // Salvar parâmetros no sessionStorage para validação posterior
+      // Armazenar dados da sessão OAuth
+      const redirectUri = `${window.location.origin}/auth/callback`
+      
       sessionStorage.setItem('oauth_state', state)
       sessionStorage.setItem('oauth_redirect_uri', redirectUri)
       sessionStorage.setItem('oauth_client_id', loginInfo.clientId)
-      sessionStorage.setItem('oauth_code_verifier', codeVerifier) // IMPORTANTE para PKCE
+      sessionStorage.setItem('oauth_code_verifier', codeVerifier)
       
-      console.log('PKCE parameters gerados:', {
+      console.log('Parâmetros PKCE gerados:', {
         codeVerifier: codeVerifier.substring(0, 8) + '...',
         codeChallenge: codeChallenge.substring(0, 8) + '...',
-      })
-      
-      // Construir URL de login com todos os parâmetros necessários incluindo PKCE
-      const params = new URLSearchParams({
-        client_id: loginInfo.clientId,
-        response_type: 'code',
-        scope: 'openid profile email',
-        redirect_uri: redirectUri,
-        state: state,
-        response_mode: 'query',
-        // Parâmetros PKCE
-        code_challenge: codeChallenge,
-        code_challenge_method: 'S256'
-      })
-      
-      const loginUrl = `${loginInfo.authServerUrl}/protocol/openid-connect/auth?${params.toString()}`
-      
-      console.log('Redirecionando para login com PKCE:', {
-        url: loginUrl.substring(0, 100) + '...',
-        redirectUri: redirectUri,
-        clientId: loginInfo.clientId,
         state: state.substring(0, 8) + '...',
-        codeChallenge: codeChallenge.substring(0, 8) + '...'
+        redirectUri
       })
       
-      window.location.href = loginUrl
+      // Construir URL de autorização
+      const authUrl = new URL(`${loginInfo.authServerUrl}/protocol/openid-connect/auth`)
+      authUrl.searchParams.set('client_id', loginInfo.clientId)
+      authUrl.searchParams.set('response_type', 'code')
+      authUrl.searchParams.set('scope', 'openid profile email')
+      authUrl.searchParams.set('redirect_uri', redirectUri)
+      authUrl.searchParams.set('state', state)
+      authUrl.searchParams.set('code_challenge', codeChallenge)
+      authUrl.searchParams.set('code_challenge_method', 'S256')
+      
+      console.log('Redirecionando para:', authUrl.toString())
+      
+      // Redirecionar para o Keycloak
+      window.location.href = authUrl.toString()
       
     } catch (error) {
-      console.error('Erro ao obter informações de login:', error)
-      throw new Error('Falha ao iniciar processo de login')
+      console.error('Erro no processo de login:', error)
+      throw new Error('Falha ao iniciar processo de autenticação')
     }
   }
 
-  // MÉTODO ATUALIZADO: handleCallback com suporte PKCE
+  // MÉTODO CORRIGIDO: handleCallback com melhor sequenciamento
   async handleCallback(code: string, redirectUri: string): Promise<boolean> {
     try {
       console.log('Iniciando processamento do callback OAuth2 com PKCE...')
       
-      // Verificar se o código está presente
-      if (!code || code.trim() === '') {
-        throw new Error('Código de autorização ausente ou vazio')
-      }
-      
-      // Validar state
+      // Validar state para prevenir CSRF
       const urlParams = new URLSearchParams(window.location.search)
       const receivedState = urlParams.get('state')
       const savedState = sessionStorage.getItem('oauth_state')
@@ -163,8 +150,11 @@ export class AuthService {
       // Trocar código por token
       const tokenResponse = await this.exchangeCodeForToken(code, redirectUri, codeVerifier)
       
-      // Armazenar tokens
+      // CORREÇÃO: Armazenar tokens ANTES de qualquer validação
       this.storeTokens(tokenResponse)
+      
+      // CORREÇÃO: Aguardar um pouco para garantir que o token seja propagado
+      await new Promise(resolve => setTimeout(resolve, 100))
       
       // Limpar dados temporários
       sessionStorage.removeItem('oauth_state')
@@ -188,7 +178,7 @@ export class AuthService {
     }
   }
 
-  // MÉTODO ATUALIZADO: exchangeCodeForToken com suporte PKCE
+  // MÉTODO CORRIGIDO: exchangeCodeForToken com melhor tratamento de resposta
   private async exchangeCodeForToken(code: string, redirectUri: string, codeVerifier: string): Promise<TokenResponse> {
     try {
       console.log('Trocando código por token com PKCE...')
@@ -196,7 +186,7 @@ export class AuthService {
       const requestData = {
         code: code,
         redirectUri: redirectUri,
-        codeVerifier: codeVerifier // Adicionar code_verifier para PKCE
+        codeVerifier: codeVerifier
       }
       
       console.log('Dados da requisição token:', {
@@ -258,29 +248,30 @@ export class AuthService {
       return responseData
       
     } catch (error) {
-      console.error('Erro na troca código->token:', error)
-      if (error instanceof Error) {
-        throw error
-      }
-      throw new Error(`Falha na obtenção do token: ${error}`)
+      console.error('Erro ao trocar código por token:', error)
+      throw error
     }
   }
 
-  // MÉTODO ATUALIZADO: storeTokens com logs melhorados
+  // MÉTODO CORRIGIDO: storeTokens com melhor sincronização
   private storeTokens(tokenResponse: TokenResponse): void {
     try {
+      console.log('Armazenando tokens...')
+      
+      // Calcular tempo de expiração
+      const expiresIn = tokenResponse.expires_in || 3600 // Default 1 hora
+      const expiresAt = Date.now() + (expiresIn * 1000)
+      
+      // Armazenar tokens de forma síncrona
       localStorage.setItem('access_token', tokenResponse.access_token)
+      localStorage.setItem('token_expires_at', expiresAt.toString())
       
       if (tokenResponse.refresh_token) {
         localStorage.setItem('refresh_token', tokenResponse.refresh_token)
       }
       
-      // Calcular e armazenar data de expiração
-      const expiresAt = Date.now() + (tokenResponse.expires_in * 1000)
-      localStorage.setItem('token_expires_at', expiresAt.toString())
-      
       console.log('Tokens armazenados com sucesso:', {
-        expires_in: tokenResponse.expires_in,
+        expires_in: expiresIn,
         expires_at: new Date(expiresAt).toISOString(),
         has_refresh_token: !!tokenResponse.refresh_token
       })
