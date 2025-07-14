@@ -3,8 +3,8 @@
     <div class="flex h-full flex-col">
       <!-- Logo -->
       <div class="flex h-16 items-center px-6 border-b border-gray-200">
-        <h2 class="text-lg font-semibold text-gray-900">
-          {{ APP_CONFIG.name }}
+        <h2 class="text-lg font-bold text-blue-600">
+          DurvalCRM
         </h2>
       </div>
       
@@ -17,7 +17,7 @@
               class="group flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors duration-200"
               :class="[
                 $route.path === item.href
-                  ? 'bg-primary-100 text-primary-700'
+                  ? 'bg-blue-100 text-blue-700'
                   : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
               ]"
             >
@@ -26,7 +26,7 @@
                 class="mr-3 h-5 w-5 flex-shrink-0"
                 :class="[
                   $route.path === item.href
-                    ? 'text-primary-500'
+                    ? 'text-blue-500'
                     : 'text-gray-400 group-hover:text-gray-500'
                 ]"
                 aria-hidden="true"
@@ -40,7 +40,7 @@
       <!-- Footer -->
       <div class="border-t border-gray-200 p-4">
         <p class="text-xs text-gray-500 text-center">
-          {{ APP_CONFIG.name }} v{{ APP_CONFIG.version }}
+          <span class="font-semibold text-blue-600">DurvalCRM</span> v{{ APP_CONFIG.version }}
         </p>
       </div>
     </div>

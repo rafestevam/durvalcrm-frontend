@@ -1,8 +1,8 @@
 <template>
   <div class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
-      <h2 class="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
-        {{ APP_CONFIG.name }}
+      <h2 class="mt-6 text-center text-4xl font-bold tracking-tight text-blue-600">
+        DurvalCRM
       </h2>
       <p class="mt-2 text-center text-sm text-gray-600">
         Acesse o sistema para continuar
@@ -30,6 +30,7 @@
               :loading="isLoading"
               :full-width="true"
               @click="handleLogin"
+              class="bg-blue-600 hover:bg-blue-700 focus:ring-blue-500"
             >
               <template v-if="!isLoading">
                 Entrar com Keycloak
@@ -49,7 +50,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { APP_CONFIG, ROUTES } from '@/utils/constants'
+import { ROUTES } from '@/utils/constants'
 import BaseButton from '@/components/common/BaseButton.vue'
 import AlertMessage from '@/components/common/AlertMessage.vue'
 

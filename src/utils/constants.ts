@@ -79,9 +79,9 @@ export const STORAGE_KEYS = {
 } as const
 
 export const APP_CONFIG = {
-  NAME: 'DurvalCRM',
-  VERSION: '1.0.0',
-  DESCRIPTION: 'Sistema de gestão para associação',
+  name: 'DurvalCRM',
+  version: '1.0.0',
+  description: 'Sistema de gestão para associação',
   
   // Configurações de autenticação
   AUTH: {
@@ -139,3 +139,51 @@ export const ERROR_MESSAGES = {
     LOGOUT_FAILED: 'Erro ao fazer logout',
   },
 } as const
+
+// Constantes para Mensalidades
+export const MESES = [
+  { value: 1, label: 'Janeiro' },
+  { value: 2, label: 'Fevereiro' },
+  { value: 3, label: 'Março' },
+  { value: 4, label: 'Abril' },
+  { value: 5, label: 'Maio' },
+  { value: 6, label: 'Junho' },
+  { value: 7, label: 'Julho' },
+  { value: 8, label: 'Agosto' },
+  { value: 9, label: 'Setembro' },
+  { value: 10, label: 'Outubro' },
+  { value: 11, label: 'Novembro' },
+  { value: 12, label: 'Dezembro' },
+] as const
+
+export const MENSALIDADE_STATUS = {
+  PENDENTE: 'Pendente',
+  PAGA: 'Paga',
+  ATRASADA: 'Atrasada',
+} as const
+
+export const MENSALIDADE_STATUS_COLORS = {
+  PENDENTE: 'bg-yellow-100 text-yellow-800',
+  PAGA: 'bg-green-100 text-green-800',
+  ATRASADA: 'bg-red-100 text-red-800',
+} as const
+
+// Constantes para Vendas
+export const VENDA_ORIGENS = [
+  { value: 'CANTINA', label: 'Cantina' },
+  { value: 'BAZAR', label: 'Bazar' },
+  { value: 'LIVROS', label: 'Livros' },
+] as const
+
+// Constantes para Reconciliação
+export const PAGAMENTO_METODOS = [
+  { value: 'PIX', label: 'PIX' },
+  { value: 'DINHEIRO', label: 'Dinheiro' },
+  { value: 'CARTAO', label: 'Cartão' },
+] as const
+
+export const ORIGEM_INFORMACAO = [
+  { value: 'MANUAL', label: 'Manual' },
+  { value: 'EXTRATO_CSV', label: 'Extrato CSV' },
+  { value: 'EXTRATO_OFX', label: 'Extrato OFX' },
+] as const

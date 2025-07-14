@@ -6,7 +6,7 @@
         <div class="flex items-center">
           <button
             type="button"
-            class="lg:hidden -ml-0.5 -mt-0.5 h-12 w-12 inline-flex items-center justify-center rounded-md text-gray-500 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500"
+            class="lg:hidden -ml-0.5 -mt-0.5 h-12 w-12 inline-flex items-center justify-center rounded-md text-gray-500 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
             @click="toggleMobileMenu"
           >
             <span class="sr-only">Abrir menu</span>
@@ -14,8 +14,8 @@
           </button>
           
           <div class="flex items-center ml-4 lg:ml-0">
-            <h1 class="text-xl font-semibold text-gray-900">
-              {{ APP_CONFIG.name }}
+            <h1 class="text-xl font-bold text-blue-600">
+              DurvalCRM
             </h1>
           </div>
         </div>
@@ -30,7 +30,7 @@
           <div class="relative">
             <button
               type="button"
-              class="flex max-w-xs items-center rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+              class="flex max-w-xs items-center rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
               @click="toggleUserMenu"
             >
               <span class="sr-only">Abrir menu do usuário</span>
@@ -70,7 +70,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { Bars3Icon, UserCircleIcon } from '@heroicons/vue/24/outline'
 import { useAuthStore } from '@/stores/auth'
-import { APP_CONFIG, ROUTES } from '@/utils/constants'
+import { ROUTES } from '@/utils/constants'
 
 const router = useRouter()
 const authStore = useAuthStore()
