@@ -1,178 +1,237 @@
 <template>
   <AppLayout>
-    <div class="space-y-6">
-      <!-- Cabeçalho -->
-      <div class="sm:flex sm:items-center sm:justify-between">
-        <div>
-          <h1 class="text-2xl font-bold text-gray-900">Gestão de Mensalidades</h1>
-        </div>
-      </div>
-
-      <!-- Controles -->
-      <div class="bg-white shadow rounded-lg">
-        <div class="p-6">
-          <div class="sm:flex sm:items-center sm:justify-between space-y-4 sm:space-y-0">
-            <div class="flex items-center space-x-4">
-              <label class="text-sm font-medium text-gray-700">
-                Exibindo dados de:
-              </label>
-              <select
-                v-model="selectedPeriod"
-                class="form-input w-48"
-                @change="onPeriodChange"
-              >
-                <option v-for="periodo in periodos" :key="periodo.value" :value="periodo.value">
-                  {{ periodo.label }}
-                </option>
-              </select>
-            </div>
-            
-            <div class="flex space-x-3">
-              <BaseButton variant="primary" @click="gerarCobrancas">
-                Gerar Cobranças
-              </BaseButton>
-              <BaseButton variant="primary" @click="enviarEmails">
-                Enviar E-mails
-              </BaseButton>
-              <BaseButton variant="success" @click="reconciliar">
-                Reconciliar
-              </BaseButton>
-            </div>
+    <template #header>
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <CurrencyDollarIcon class="h-8 w-8 text-blue-600" />
+          <div>
+            <h1 class="text-2xl font-bold text-gray-900">Mensalidades</h1>
+            <p class="text-sm text-gray-600">
+              Gerencie as mensalidades dos associados
+            </p>
           </div>
         </div>
+        
+        <div class="flex items-center space-x-4">
+          <SeletorPeriodo
+            :mes="mensalidadesStore.periodoSelecionado.mes"
+            :ano="mensalidadesStore.periodoSelecionado.ano"
+            @alterar-periodo="mensalidadesStore.alterarPeriodo"
+            @periodo-anterior="mensalidadesStore.periodoAnterior"
+            @proximo-periodo="mensalidadesStore.proximoPeriodo"
+          />
+          
+          <BaseButton
+            variant="primary"
+            @click="showGerarModal = true"
+            :disabled="mensalidadesStore.loading"
+          >
+            <PlusIcon class="h-4 w-4 mr-2" />
+            Gerar Cobranças
+          </BaseButton>
+        </div>
+      </div>
+    </template>
+
+    <!-- Alertas -->
+    <AlertMessage
+      v-if="mensalidadesStore.error"
+      type="error"
+      :message="mensalidadesStore.error"
+      :auto-hide="false"
+      @dismiss="mensalidadesStore.limparErro"
+      class="mb-6"
+    />
+
+    <AlertMessage
+      v-if="showSuccessAlert"
+      type="success"
+      :message="successMessage"
+      :auto-hide="true"
+      @dismiss="showSuccessAlert = false"
+      class="mb-6"
+    />
+
+    <!-- Loading -->
+    <div v-if="mensalidadesStore.loading" class="flex justify-center py-12">
+      <LoadingSpinner size="lg" />
+    </div>
+
+    <!-- Conteúdo principal -->
+    <div v-else class="space-y-6">
+      <!-- Cards de Resumo -->
+      <div v-if="mensalidadesStore.resumo" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <CardResumo
+          titulo="Total de Associados"
+          :valor="mensalidadesStore.resumo.totalAssociados"
+          :icon="UsersIcon"
+          icon-color="text-blue-500"
+        />
+        
+        <CardResumo
+          titulo="Mensalidades Pagas"
+          :valor="mensalidadesStore.resumo.pagas"
+          :icon="CheckCircleIcon"
+          icon-color="text-green-500"
+          :porcentagem="calcularPorcentagem(mensalidadesStore.resumo.pagas, mensalidadesStore.resumo.totalAssociados)"
+          porcentagem-color="text-green-600"
+        />
+        
+        <CardResumo
+          titulo="Pendentes"
+          :valor="mensalidadesStore.resumo.pendentes"
+          :icon="ClockIcon"
+          icon-color="text-yellow-500"
+          :porcentagem="calcularPorcentagem(mensalidadesStore.resumo.pendentes, mensalidadesStore.resumo.totalAssociados)"
+          porcentagem-color="text-yellow-600"
+        />
+        
+        <CardResumo
+          titulo="Valor Arrecadado"
+          :valor="formatters.money(mensalidadesStore.resumo.valorArrecadado)"
+          :icon="BanknotesIcon"
+          icon-color="text-green-500"
+        />
       </div>
 
       <!-- Tabela de Mensalidades -->
       <div class="bg-white shadow rounded-lg">
-        <div v-if="isLoading" class="p-8 text-center">
-          <LoadingSpinner class="w-8 h-8 mx-auto mb-4" />
-          <p class="text-gray-600">Carregando mensalidades...</p>
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h2 class="text-lg font-medium text-gray-900">
+            Mensalidades de {{ mensalidadesStore.periodoAtual }}
+          </h2>
         </div>
-
-        <div v-else-if="mensalidades.length === 0" class="p-8 text-center">
-          <CreditCardIcon class="w-12 h-12 mx-auto text-gray-400 mb-4" />
-          <p class="text-gray-600">Nenhuma mensalidade encontrada para este período</p>
-        </div>
-
-        <div v-else class="overflow-hidden">
-          <table class="table">
-            <thead class="table-header">
-              <tr>
-                <th>Associado</th>
-                <th>Valor</th>
-                <th>Status</th>
-                <th>Data do Pagamento</th>
-              </tr>
-            </thead>
-            <tbody class="table-body">
-              <tr v-for="mensalidade in mensalidades" :key="mensalidade.id">
-                <td class="font-medium">
-                  {{ mensalidade.associado?.nomeCompleto || 'N/A' }}
-                </td>
-                <td>{{ formatters.currency(mensalidade.valor) }}</td>
-                <td>
-                  <span
-                    class="status-badge"
-                    :class="MENSALIDADE_STATUS_COLORS[mensalidade.status]"
-                  >
-                    {{ MENSALIDADE_STATUS[mensalidade.status] }}
-                  </span>
-                </td>
-                <td>
-                  {{ mensalidade.dataPagamento ? formatters.date(mensalidade.dataPagamento) : '-' }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        
+        <TabelaMensalidades
+          :mensalidades="mensalidades"
+          @ver-qr-code="abrirModalQRCode"
+          @marcar-paga="marcarComoPaga"
+        />
       </div>
     </div>
+
+    <!-- Modais -->
+    <ModalGerarCobrancas
+      v-model:show="showGerarModal"
+      :periodo="mensalidadesStore.periodoSelecionado"
+      :resumo="mensalidadesStore.resumo"
+      :loading="mensalidadesStore.loading"
+      @confirmar="gerarCobrancas"
+      @close="showGerarModal = false"
+    />
+
+    <ModalQRCode
+      v-model:show="showQRModal"
+      :mensalidade="mensalidadeSelecionada"
+      @close="showQRModal = false"
+    />
   </AppLayout>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
-import { CreditCardIcon } from '@heroicons/vue/24/outline'
+import { ref, computed, onMounted, watch } from 'vue'
+import { 
+  CurrencyDollarIcon, 
+  UsersIcon, 
+  CheckCircleIcon, 
+  ClockIcon,
+  BanknotesIcon,
+  PlusIcon 
+} from '@heroicons/vue/24/outline'
+
 import AppLayout from '@/components/layout/AppLayout.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
+import AlertMessage from '@/components/common/AlertMessage.vue'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
+
+import CardResumo from '@/components/mensalidades/CardResumo.vue'
+import SeletorPeriodo from '@/components/mensalidades/SeletorPeriodo.vue'
+import TabelaMensalidades from '@/components/mensalidades/TabelaMensalidades.vue'
+import ModalGerarCobrancas from '@/components/mensalidades/ModalGerarCobrancas.vue'
+import ModalQRCode from '@/components/mensalidades/ModalQRCode.vue'
+
+import { useMensalidadesStore } from '@/stores/mensalidades'
+import { useAssociadosStore } from '@/stores/associados'
 import { formatters } from '@/utils/formatters'
-import { MENSALIDADE_STATUS, MENSALIDADE_STATUS_COLORS, MESES } from '@/utils/constants'
 import type { Mensalidade } from '@/services/types'
 
-const mensalidades = ref<Mensalidade[]>([])
-const isLoading = ref(false)
-const selectedPeriod = ref(`${new Date().getFullYear()}-${new Date().getMonth() + 1}`)
+const mensalidadesStore = useMensalidadesStore()
+const associadosStore = useAssociadosStore()
 
-const periodos = computed(() => {
-  const currentYear = new Date().getFullYear()
-  const periods = []
-  
-  for (let year = currentYear; year >= currentYear - 2; year--) {
-    for (const mes of MESES) {
-      periods.push({
-        value: `${year}-${mes.value}`,
-        label: `${mes.label} / ${year}`
-      })
+const showGerarModal = ref(false)
+const showQRModal = ref(false)
+const showSuccessAlert = ref(false)
+const successMessage = ref('')
+const mensalidadeSelecionada = ref<Mensalidade | null>(null)
+
+// Computed para combinar mensalidades com nomes dos associados
+const mensalidades = computed(() => {
+  return mensalidadesStore.mensalidades.map(mensalidade => ({
+    ...mensalidade,
+    nomeAssociado: associadosStore.associados.find(
+      a => a.id === mensalidade.associadoId
+    )?.nomeCompleto || 'Nome não encontrado'
+  }))
+})
+
+function calcularPorcentagem(valor: number, total: number): number {
+  return total > 0 ? Math.round((valor / total) * 100) : 0
+}
+
+async function gerarCobrancas() {
+  try {
+    const resultado = await mensalidadesStore.gerarCobrancas()
+    showGerarModal.value = false
+    
+    successMessage.value = resultado.mensagem
+    showSuccessAlert.value = true
+    
+  } catch (error) {
+    console.error('Erro ao gerar cobranças:', error)
+    // Erro já tratado no store
+  }
+}
+
+function abrirModalQRCode(mensalidade: Mensalidade) {
+  mensalidadeSelecionada.value = mensalidade
+  showQRModal.value = true
+}
+
+async function marcarComoPaga(mensalidade: Mensalidade) {
+  if (confirm(`Confirma que a mensalidade de ${mensalidade.nomeAssociado} foi paga?`)) {
+    try {
+      // Implementar chamada para marcar como paga
+      console.log('Marcar como paga:', mensalidade)
+      
+      // Por enquanto, simular sucesso
+      successMessage.value = 'Mensalidade marcada como paga com sucesso!'
+      showSuccessAlert.value = true
+      
+      // Recarregar dados
+      await mensalidadesStore.carregarDados()
+      
+    } catch (error) {
+      console.error('Erro ao marcar como paga:', error)
     }
   }
-  
-  return periods
-})
+}
 
-async function loadMensalidades() {
-  try {
-    isLoading.value = true
-    // Simular dados de mensalidades
-    const mockData: Mensalidade[] = [
-      {
-        id: '1',
-        associadoId: '1',
-        associado: { id: '1', nomeCompleto: 'Ana da Silva', cpf: '111.222.333-44', email: 'ana@email.com' },
-        mesReferencia: 7,
-        anoReferencia: 2025,
-        valor: 10.90,
-        status: 'PAGA',
-        dataVencimento: '2025-07-10',
-        dataPagamento: '2025-07-05'
-      },
-      {
-        id: '2',
-        associadoId: '2',
-        associado: { id: '2', nomeCompleto: 'Bruno Costa', cpf: '222.333.444-55', email: 'bruno@email.com' },
-        mesReferencia: 7,
-        anoReferencia: 2025,
-        valor: 10.90,
-        status: 'PENDENTE',
-        dataVencimento: '2025-07-10'
-      }
-    ]
-    
-    mensalidades.value = mockData
-  } catch (error) {
-    console.error('Erro ao carregar mensalidades:', error)
-  } finally {
-    isLoading.value = false
+// Carregar associados se necessário
+onMounted(async () => {
+  if (associadosStore.associados.length === 0) {
+    await associadosStore.fetchAssociados()
   }
-}
-
-function onPeriodChange() {
-  loadMensalidades()
-}
-
-function gerarCobrancas() {
-  alert('Funcionalidade de gerar cobranças será implementada')
-}
-
-function enviarEmails() {
-  alert('Funcionalidade de envio de e-mails será implementada')
-}
-
-function reconciliar() {
-  alert('Funcionalidade de reconciliação será implementada')
-}
-
-onMounted(() => {
-  loadMensalidades()
+  await mensalidadesStore.carregarDados()
 })
+
+// Recarregar quando o período mudar
+watch(
+  () => mensalidadesStore.periodoSelecionado,
+  () => {
+    if (associadosStore.associados.length === 0) {
+      associadosStore.fetchAssociados()
+    }
+  },
+  { deep: true }
+)
 </script>

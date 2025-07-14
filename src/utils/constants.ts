@@ -187,3 +187,11 @@ export const ORIGEM_INFORMACAO = [
   { value: 'EXTRATO_CSV', label: 'Extrato CSV' },
   { value: 'EXTRATO_OFX', label: 'Extrato OFX' },
 ] as const
+
+export const STATUS_MENSALIDADE = {
+  PENDENTE: { label: 'Pendente', color: 'yellow' },
+  PAGA: { label: 'Paga', color: 'green' },
+  ATRASADA: { label: 'Atrasada', color: 'red' }
+}
+
+export const VALOR_MENSALIDADE = 10.90

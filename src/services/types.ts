@@ -102,3 +102,46 @@ export interface KeycloakConfig {
   realm: string
   clientId: string
 }
+
+export interface Mensalidade {
+  id: string
+  associadoId: string
+  nomeAssociado?: string
+  mesReferencia: number
+  anoReferencia: number
+  valor: number
+  status: StatusMensalidade
+  dataVencimento: string
+  dataPagamento?: string
+  qrCodePix: string
+  identificadorPix: string
+  vencida: boolean
+}
+
+export enum StatusMensalidade {
+  PENDENTE = 'PENDENTE',
+  PAGA = 'PAGA',
+  ATRASADA = 'ATRASADA'
+}
+
+export interface ResumoMensalidades {
+  totalAssociados: number
+  pagas: number
+  pendentes: number
+  atrasadas: number
+  valorArrecadado: number
+  valorPendente: number
+}
+
+export interface ResultadoGeracao {
+  cobrancasGeradas: number
+  jaExistiam: number
+  totalAssociados: number
+  mensagem: string
+}
+
+export interface PeriodoMensalidade {
+  mes: number
+  ano: number
+  label: string
+}
