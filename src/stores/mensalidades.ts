@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { mensalidadeService } from '@/services/mensalidadeService'
+import { mensalidadeService } from '@/services/mensalidade'
 import type { 
   Mensalidade, 
   ResumoMensalidades, 
