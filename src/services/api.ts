@@ -1,16 +1,17 @@
 import axios from 'axios'
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
-import authService from './auth'
 
 // Configuração base da API
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8082/api'
 
 export class ApiService {
   private api: AxiosInstance
+  private baseURL: string
 
   constructor() {
+    this.baseURL = API_BASE_URL
     this.api = axios.create({
-      baseURL: API_BASE_URL,
+      baseURL: this.baseURL,
       timeout: 10000,
       headers: {
         'Content-Type': 'application/json',
@@ -47,27 +48,68 @@ export class ApiService {
           originalRequest._retry = true
 
           try {
-            // Tentar validar token
-            const tokenValid = await authService.validateToken()
-            if (!tokenValid.valid) {
-              // Token inválido, redirecionar para login
-              localStorage.removeItem('access_token')
-              localStorage.removeItem('user_info')
-              authService.redirectToLogin()
-              return Promise.reject(error)
+            // Verificar se temos refresh token
+            const refreshToken = localStorage.getItem('refresh_token')
+            if (refreshToken) {
+              // Tentar renovar token
+              const success = await this.refreshAccessToken(refreshToken)
+              if (success) {
+                // Retry da requisição original com novo token
+                const newToken = localStorage.getItem('access_token')
+                if (newToken) {
+                  originalRequest.headers.Authorization = `Bearer ${newToken}`
+                  return this.api(originalRequest)
+                }
+              }
             }
+            
+            // Se não conseguiu renovar, limpar tokens e redirecionar
+            this.clearTokensAndRedirect()
+            
           } catch (refreshError) {
-            // Erro na validação, redirecionar para login
-            localStorage.removeItem('access_token')
-            localStorage.removeItem('user_info')
-            authService.redirectToLogin()
-            return Promise.reject(error)
+            console.error('Erro ao renovar token:', refreshError)
+            this.clearTokensAndRedirect()
           }
         }
 
         return Promise.reject(error)
       }
     )
+  }
+
+  private async refreshAccessToken(refreshToken: string): Promise<boolean> {
+    try {
+      // Implementar refresh token se o Keycloak/backend suportar
+      // Por enquanto, vamos apenas validar o token atual
+      const response = await fetch(`${this.baseURL}/auth/validate`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+        }
+      })
+      
+      return response.ok
+      
+    } catch (error) {
+      console.error('Erro na validação do token:', error)
+      return false
+    }
+  }
+
+  private clearTokensAndRedirect(): void {
+    localStorage.removeItem('access_token')
+    localStorage.removeItem('refresh_token')
+    localStorage.removeItem('token_expires_at')
+    localStorage.removeItem('user_info')
+    
+    // Redirecionar para login apenas se não estivermos já na página de login
+    if (!window.location.pathname.includes('/login') && !window.location.pathname.includes('/auth/callback')) {
+      window.location.href = '/login'
+    }
+  }
+
+  // Método público para obter a base URL
+  getBaseUrl(): string {
+    return this.baseURL
   }
 
   async get<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
@@ -96,5 +138,9 @@ export class ApiService {
   }
 }
 
-export const apiService = new ApiService()
+// Exportação da instância como default
+const apiService = new ApiService()
 export default apiService
+
+// Exportação nomeada para compatibilidade
+export { apiService }
