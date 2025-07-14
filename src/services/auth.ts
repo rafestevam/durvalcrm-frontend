@@ -35,7 +35,7 @@ export class AuthService {
   }
 
   async getUserInfo(): Promise<UserInfo> {
-    return apiService.get<UserInfo>('/auth/me')
+    return apiService.get<UserInfo>('/auth/user-info')
   }
 
   async validateToken(): Promise<{ valid: boolean; username?: string }> {

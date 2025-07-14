@@ -134,43 +134,45 @@ export class ApiService {
     this.failedQueue = []
   }
 
-  // Método para tentar renovar o access token
-  private async refreshAccessToken(refreshToken: string): Promise<boolean> {
-    try {
-      console.log('Tentando renovar access token...')
-      
-      const response = await axios.post(`${this.baseURL}/auth/refresh`, {
-        refresh_token: refreshToken
-      }, {
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        timeout: 5000 // Timeout menor para refresh
-      })
+  // Método para tentar renovar o access token - CORRIGIDO
+private async refreshAccessToken(refreshToken: string): Promise<boolean> {
+  try {
+    console.log('Tentando renovar access token...')
+    
+    // CORREÇÃO: Enviar como application/x-www-form-urlencoded
+    const formData = new URLSearchParams()
+    formData.append('refresh_token', refreshToken)
+    
+    const response = await axios.post(`${this.baseURL}/auth/refresh`, formData, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'  // ✅ Content-Type correto
+      },
+      timeout: 5000 // Timeout menor para refresh
+    })
 
-      if (response.data?.access_token) {
-        // Armazenar novo token
-        localStorage.setItem('access_token', response.data.access_token)
-        
-        if (response.data.refresh_token) {
-          localStorage.setItem('refresh_token', response.data.refresh_token)
-        }
-        
-        // Calcular nova expiração
-        const expiresIn = response.data.expires_in || 3600
-        const expiresAt = Date.now() + (expiresIn * 1000)
-        localStorage.setItem('token_expires_at', expiresAt.toString())
-        
-        console.log('Token renovado com sucesso')
-        return true
+    if (response.data?.access_token) {
+      // Armazenar novo token
+      localStorage.setItem('access_token', response.data.access_token)
+      
+      if (response.data.refresh_token) {
+        localStorage.setItem('refresh_token', response.data.refresh_token)
       }
       
-      return false
-    } catch (error) {
-      console.error('Erro ao renovar token:', error)
-      return false
+      // Calcular nova expiração
+      const expiresIn = response.data.expires_in || 3600
+      const expiresAt = Date.now() + (expiresIn * 1000)
+      localStorage.setItem('token_expires_at', expiresAt.toString())
+      
+      console.log('Token renovado com sucesso')
+      return true
     }
+    
+    return false
+  } catch (error) {
+    console.error('Erro ao renovar token:', error)
+    return false
   }
+}
 
   // Limpar tokens e redirecionar para login
   private clearTokensAndRedirect(): void {
