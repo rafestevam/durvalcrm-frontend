@@ -1,10 +1,53 @@
-// Tipos compartilhados da aplicação
+import type Keycloak from 'keycloak-js'
+
+// Tipos de dados da aplicação
 export interface Associado {
   id?: string
   nomeCompleto: string
   cpf: string
   email: string
   telefone?: string
+  ativo?: boolean
+  criadoEm?: string
+}
+
+export interface AssociadoForm {
+  nomeCompleto: string
+  cpf: string
+  email: string
+  telefone: string
+}
+
+export interface User {
+  id?: string
+  email: string
+  name: string
+  username: string
+  firstName?: string
+  lastName?: string
+  roles?: string[]
+}
+
+export interface KeycloakUser {
+  sub: string
+  email_verified: boolean
+  name: string
+  preferred_username: string
+  given_name: string
+  family_name: string
+  email: string
+}
+
+export interface ApiResponse<T> {
+  data: T
+  message?: string
+  status: number
+}
+
+export interface ApiError {
+  message: string
+  status: number
+  errors?: Record<string, string[]>
 }
 
 export interface Mensalidade {
@@ -26,22 +69,36 @@ export interface Venda {
   dataVenda: string
 }
 
-export interface Usuario {
-  username: string
-  email?: string
-  name?: string
-  roles?: string[]
+export interface FormValidationErrors {
+  [key: string]: string
 }
 
-export interface ApiResponse<T> {
-  data: T
-  message?: string
+export interface AlertMessage {
+  type: 'success' | 'error' | 'warning' | 'info'
+  message: string
+  show: boolean
 }
 
-export interface PaginatedResponse<T> {
-  content: T[]
-  totalElements: number
-  totalPages: number
-  size: number
-  number: number
+// Tipos para Pinia stores
+export interface AuthState {
+  user: User | null
+  keycloak: Keycloak | null
+  token: string | null
+  isAuthenticated: boolean
+  loading: boolean
+  initialized: boolean
+}
+
+export interface AssociadosState {
+  associados: Associado[]
+  loading: boolean
+  searchQuery: string
+  selectedAssociado: Associado | null
+}
+
+// Configuração do Keycloak
+export interface KeycloakConfig {
+  url: string
+  realm: string
+  clientId: string
 }
