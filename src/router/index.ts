@@ -2,16 +2,13 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { ROUTES } from '@/utils/constants'
 
-// Importa o componente de redirecionamento para Keycloak
-const KeycloakRedirectView = () => import('@/views/KeycloakRedirectView.vue')
-
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: ROUTES.LOGIN,
       name: 'Login',
-      component: KeycloakRedirectView,
+      component: () => import('@/views/LoginView.vue'),
       meta: { requiresGuest: true },
     },
     {
@@ -44,28 +41,9 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
-      path: '/',
-      name: 'Root',
-      redirect: (to) => {
-        const authStore = useAuthStore()
-        if (authStore.isAuthenticated) {
-          return ROUTES.DASHBOARD
-        } else {
-          return ROUTES.LOGIN
-        }
-      },
-    },
-    {
       path: '/:pathMatch(.*)*',
       name: 'NotFound',
-      redirect: (to) => {
-        const authStore = useAuthStore()
-        if (authStore.isAuthenticated) {
-          return ROUTES.DASHBOARD
-        } else {
-          return ROUTES.LOGIN
-        }
-      },
+      redirect: ROUTES.DASHBOARD,
     },
   ],
 })
@@ -78,8 +56,7 @@ router.beforeEach(async (to, from, next) => {
   if (to.meta.requiresAuth) {
     const isValid = await authStore.validateSession()
     if (!isValid) {
-      // Em vez de ir para LOGIN, redireciona diretamente para Keycloak
-      authStore.redirectToLogin()
+      next(ROUTES.LOGIN)
       return
     }
   }
