@@ -1,41 +1,3 @@
-<template>
-  <div class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-    <div class="sm:mx-auto sm:w-full sm:max-w-md">
-      <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-        <div class="text-center">
-          <LoadingSpinner v-if="isLoading" class="w-8 h-8 mx-auto mb-4" />
-          <div v-else-if="error" class="text-red-500 mb-4">
-            <svg class="w-8 h-8 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
-          </div>
-          
-          <h2 class="text-lg font-medium text-gray-900 mb-2">
-            <span v-if="isLoading">Finalizando autenticação...</span>
-            <span v-else-if="error">Erro na autenticação</span>
-            <span v-else>Redirecionando...</span>
-          </h2>
-          
-          <p class="text-sm text-gray-600">
-            <span v-if="isLoading">Aguarde enquanto processamos seu login.</span>
-            <span v-else-if="error">{{ error }}</span>
-            <span v-else>Você será redirecionado em instantes.</span>
-          </p>
-          
-          <div v-if="error" class="mt-4">
-            <button 
-              @click="redirectToLogin"
-              class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-              Tentar novamente
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</template>
-
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -64,10 +26,45 @@ async function handleAuthCallback() {
     const code = route.query.code as string
     const state = route.query.state as string
     const errorParam = route.query.error as string
+    const errorDescription = route.query.error_description as string
+    
+    console.log('Parâmetros do callback:', {
+      code: code ? code.substring(0, 10) + '...' : 'ausente',
+      state: state ? 'presente' : 'ausente',
+      error: errorParam,
+      error_description: errorDescription
+    })
     
     // Verificar se houve erro no callback
     if (errorParam) {
-      throw new Error(`Erro na autenticação: ${errorParam}`)
+      let errorMessage = `Erro na autenticação: ${errorParam}`
+      if (errorDescription) {
+        errorMessage += ` - ${errorDescription}`
+      }
+      
+      // Mapear erros comuns para mensagens mais amigáveis
+      switch (errorParam) {
+        case 'invalid_request':
+          errorMessage = 'Configuração de autenticação inválida. Verifique as configurações do Keycloak.'
+          break
+        case 'unauthorized_client':
+          errorMessage = 'Cliente não autorizado. Verifique a configuração do cliente no Keycloak.'
+          break
+        case 'access_denied':
+          errorMessage = 'Acesso negado pelo usuário.'
+          break
+        case 'invalid_scope':
+          errorMessage = 'Escopo de permissões inválido.'
+          break
+        case 'server_error':
+          errorMessage = 'Erro interno do servidor de autenticação.'
+          break
+        case 'temporarily_unavailable':
+          errorMessage = 'Serviço de autenticação temporariamente indisponível.'
+          break
+      }
+      
+      throw new Error(errorMessage)
     }
     
     // Verificar se o código está presente
