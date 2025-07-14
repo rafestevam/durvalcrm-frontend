@@ -41,6 +41,12 @@
               </button>
             </div>
             
+            <div class="mt-4 p-3 bg-gray-100 rounded-md">
+              <p class="text-xs text-gray-500">
+                Debug Info: {{ debugInfo }}
+              </p>
+            </div>
+            
             <p class="text-xs text-gray-500">
               Você será redirecionado automaticamente em alguns segundos...
             </p>
@@ -52,7 +58,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { ROUTES } from '@/utils/constants'
@@ -65,6 +71,21 @@ const authStore = useAuthStore()
 
 const isLoading = ref(true)
 const error = ref<string | null>(null)
+
+// Debug info computado
+const debugInfo = computed(() => {
+  if (import.meta.env.DEV) {
+    return {
+      hasStoredState: !!sessionStorage.getItem('oauth_state'),
+      receivedParams: {
+        code: route.query.code ? 'presente' : 'ausente',
+        state: route.query.state ? 'presente' : 'ausente',
+        error: route.query.error || 'ausente'
+      }
+    }
+  }
+  return null
+})
 
 onMounted(async () => {
   await handleAuthCallback()
@@ -127,25 +148,23 @@ async function handleAuthCallback() {
     
     console.log('Processando código de autorização...', { code: code.substring(0, 10) + '...' })
     
-    // CORREÇÃO: Processar callback através do AuthService
-    const success = await authService.handleCallback(code, window.location.origin + '/auth/callback')
+    // CORREÇÃO: Chamar handleCallback apenas com code e redirectUri
+    const redirectUri = `${window.location.origin}/auth/callback`
+    const tokenResponse = await authService.handleCallback(code, redirectUri)
     
-    if (success) {
-      console.log('Callback processado com sucesso, aguardando propagação do token...')
+    if (tokenResponse?.access_token) {
+      console.log('Callback processado com sucesso, token obtido')
       
-      // CORREÇÃO: Aguardar um pouco para garantir que os tokens estejam disponíveis
-      await new Promise(resolve => setTimeout(resolve, 200))
+      // Aguardar um pouco para garantir que os tokens estejam armazenados
+      await new Promise(resolve => setTimeout(resolve, 100))
       
-      // CORREÇÃO: Buscar informações do usuário diretamente após obter o token
+      // Buscar informações do usuário
       try {
         const userInfo = await authService.getUserInfo()
         console.log('Informações do usuário obtidas:', userInfo)
         
-        // Usar método específico do store para callback
-        const loginSuccess = await authStore.handleAuthCallback(
-          authService.getStoredToken()!,
-          userInfo
-        )
+        // Processar login no store
+        const loginSuccess = await authStore.login(tokenResponse.access_token)
         
         if (loginSuccess) {
           console.log('Login processado com sucesso, redirecionando...')
@@ -156,20 +175,18 @@ async function handleAuthCallback() {
       } catch (userInfoError) {
         console.error('Erro ao obter informações do usuário:', userInfoError)
         
-        // Tentar login mesmo sem informações do usuário completas
-        const loginSuccess = await authStore.handleAuthCallback(
-          authService.getStoredToken()!
-        )
+        // Tentar fazer login mesmo sem informações completas do usuário
+        const loginSuccess = await authStore.login(tokenResponse.access_token)
         
         if (loginSuccess) {
-          console.log('Login processado com sucesso (sem user info), redirecionando...')
+          console.log('Login processado com sucesso (sem user info completo), redirecionando...')
           await router.push(ROUTES.DASHBOARD)
         } else {
           throw new Error('Falha no processamento da autenticação')
         }
       }
     } else {
-      throw new Error('Falha no processamento do código de autorização')
+      throw new Error('Token não recebido na resposta do callback')
     }
     
   } catch (err) {
@@ -184,7 +201,17 @@ async function handleAuthCallback() {
   }
 }
 
-function redirectToLogin() {
-  authStore.redirectToLogin()
+async function redirectToLogin() {
+  try {
+    // Limpar dados de autenticação antes de redirecionar
+    authService.clearAllAuthData()
+    
+    // Usar método do authStore para redirecionar
+    await authService.redirectToLogin()
+  } catch (error) {
+    console.error('Erro ao redirecionar para login:', error)
+    // Fallback: redirecionar diretamente para a página de login
+    router.push(ROUTES.LOGIN)
+  }
 }
 </script>

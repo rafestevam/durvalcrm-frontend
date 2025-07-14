@@ -1,4 +1,4 @@
-// src/services/auth.ts - Versão corrigida
+// src/services/auth.ts - Versão completa corrigida
 
 import apiService from './api'
 
@@ -46,6 +46,48 @@ export class AuthService {
     return apiService.get('/auth/logout')
   }
 
+  // NOVO MÉTODO: refreshToken
+  async refreshToken(): Promise<boolean> {
+    try {
+      const refreshTokenValue = this.getRefreshToken()
+      if (!refreshTokenValue) {
+        console.log('Nenhum refresh token disponível')
+        return false
+      }
+
+      console.log('Renovando token...')
+      
+      // Fazer requisição para renovar token
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8082/api'}/auth/refresh`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          refresh_token: refreshTokenValue
+        })
+      })
+
+      if (!response.ok) {
+        console.error('Erro ao renovar token:', response.statusText)
+        return false
+      }
+
+      const tokenData = await response.json()
+      
+      if (tokenData.access_token) {
+        this.storeTokens(tokenData)
+        console.log('Token renovado com sucesso')
+        return true
+      }
+
+      return false
+    } catch (error) {
+      console.error('Erro ao renovar token:', error)
+      return false
+    }
+  }
+
   // Funções utilitárias para PKCE
   private generateCodeVerifier(): string {
     const array = new Uint8Array(32)
@@ -75,175 +117,103 @@ export class AuthService {
       const loginInfo = await this.getLoginInfo()
       console.log('Informações de login obtidas:', {
         authServerUrl: loginInfo.authServerUrl,
-        clientId: loginInfo.clientId,
-        realm: loginInfo.realm
+        clientId: loginInfo.clientId
       })
       
-      // Gerar PKCE parameters
+      // Gerar state e PKCE
+      const state = this.generateState()
       const codeVerifier = this.generateCodeVerifier()
       const codeChallenge = await this.generateCodeChallenge(codeVerifier)
-      const state = this.generateState()
       
-      // Armazenar dados da sessão OAuth
+      // Salvar informações para o callback
       const redirectUri = `${window.location.origin}/auth/callback`
-      
       sessionStorage.setItem('oauth_state', state)
       sessionStorage.setItem('oauth_redirect_uri', redirectUri)
       sessionStorage.setItem('oauth_client_id', loginInfo.clientId)
       sessionStorage.setItem('oauth_code_verifier', codeVerifier)
       
-      console.log('Parâmetros PKCE gerados:', {
-        codeVerifier: codeVerifier.substring(0, 8) + '...',
-        codeChallenge: codeChallenge.substring(0, 8) + '...',
-        state: state.substring(0, 8) + '...',
-        redirectUri
+      // Construir URL de autorização
+      const authParams = new URLSearchParams({
+        response_type: 'code',
+        client_id: loginInfo.clientId,
+        redirect_uri: redirectUri,
+        scope: 'openid profile email',
+        state: state,
+        code_challenge: codeChallenge,
+        code_challenge_method: 'S256'
       })
       
-      // Construir URL de autorização
-      const authUrl = new URL(`${loginInfo.authServerUrl}/protocol/openid-connect/auth`)
-      authUrl.searchParams.set('client_id', loginInfo.clientId)
-      authUrl.searchParams.set('response_type', 'code')
-      authUrl.searchParams.set('scope', 'openid profile email')
-      authUrl.searchParams.set('redirect_uri', redirectUri)
-      authUrl.searchParams.set('state', state)
-      authUrl.searchParams.set('code_challenge', codeChallenge)
-      authUrl.searchParams.set('code_challenge_method', 'S256')
+      const authUrl = `${loginInfo.authServerUrl}/protocol/openid-connect/auth?${authParams.toString()}`
       
-      console.log('Redirecionando para:', authUrl.toString())
-      
-      // Redirecionar para o Keycloak
-      window.location.href = authUrl.toString()
+      console.log('Redirecionando para:', authUrl)
+      window.location.href = authUrl
       
     } catch (error) {
-      console.error('Erro no processo de login:', error)
-      throw new Error('Falha ao iniciar processo de autenticação')
+      console.error('Erro ao iniciar login:', error)
+      throw error
     }
   }
 
-  // MÉTODO CORRIGIDO: handleCallback com melhor sequenciamento
-  async handleCallback(code: string, redirectUri: string): Promise<boolean> {
+  // MÉTODO ATUALIZADO: handleCallback com melhor tratamento de estado
+  async handleCallback(code: string, redirectUri: string): Promise<TokenResponse> {
     try {
-      console.log('Iniciando processamento do callback OAuth2 com PKCE...')
+      console.log('Processando callback OAuth...')
       
-      // Validar state para prevenir CSRF
+      // Obter state da URL atual
       const urlParams = new URLSearchParams(window.location.search)
       const receivedState = urlParams.get('state')
-      const savedState = sessionStorage.getItem('oauth_state')
+      const storedState = sessionStorage.getItem('oauth_state')
       
       console.log('Validando state OAuth:', {
         receivedState: receivedState ? receivedState.substring(0, 8) + '...' : null,
-        savedState: savedState ? savedState.substring(0, 8) + '...' : null
+        storedState: storedState ? storedState.substring(0, 8) + '...' : null
       })
       
-      if (!receivedState || !savedState || receivedState !== savedState) {
-        throw new Error('State inválido - possível ataque CSRF')
+      // Validar state para prevenir CSRF
+      if (!storedState || !receivedState || storedState !== receivedState) {
+        console.error('Estado OAuth inválido:', { storedState, receivedState })
+        throw new Error('Estado OAuth inválido - possível ataque CSRF')
       }
       
-      // Recuperar code_verifier para PKCE
+      // Obter dados salvos do sessionStorage
+      const savedRedirectUri = sessionStorage.getItem('oauth_redirect_uri')
+      const clientId = sessionStorage.getItem('oauth_client_id')
       const codeVerifier = sessionStorage.getItem('oauth_code_verifier')
-      if (!codeVerifier) {
-        throw new Error('Code verifier não encontrado - erro no fluxo PKCE')
+      
+      if (!savedRedirectUri || !clientId || !codeVerifier) {
+        console.error('Dados OAuth incompletos:', { savedRedirectUri, clientId, codeVerifier: !!codeVerifier })
+        throw new Error('Dados OAuth incompletos no sessionStorage')
       }
       
-      console.log('Code verifier recuperado:', codeVerifier.substring(0, 8) + '...')
+      // Preparar dados para trocar código por token
+      const callbackData = {
+        code,
+        redirectUri: savedRedirectUri, // Usar o redirectUri salvo no sessionStorage
+        codeVerifier
+      }
       
-      // Trocar código por token
-      const tokenResponse = await this.exchangeCodeForToken(code, redirectUri, codeVerifier)
+      console.log('Trocando código por token...', {
+        code: code.substring(0, 10) + '...',
+        redirectUri: savedRedirectUri,
+        codeVerifier: codeVerifier.substring(0, 8) + '...'
+      })
       
-      // CORREÇÃO: Armazenar tokens ANTES de qualquer validação
-      this.storeTokens(tokenResponse)
+      const responseData = await apiService.post<TokenResponse>('/auth/callback', callbackData)
       
-      // CORREÇÃO: Aguardar um pouco para garantir que o token seja propagado
-      await new Promise(resolve => setTimeout(resolve, 100))
+      if (!responseData?.access_token) {
+        throw new Error('Token não recebido na resposta')
+      }
+      
+      console.log('Token obtido com sucesso')
+      
+      // Armazenar tokens
+      this.storeTokens(responseData)
       
       // Limpar dados temporários
       sessionStorage.removeItem('oauth_state')
       sessionStorage.removeItem('oauth_redirect_uri')
       sessionStorage.removeItem('oauth_client_id')
       sessionStorage.removeItem('oauth_code_verifier')
-      
-      console.log('Callback processado com sucesso!')
-      return true
-      
-    } catch (error) {
-      console.error('Erro no callback de autenticação:', error)
-      
-      // Limpar dados temporários em caso de erro
-      sessionStorage.removeItem('oauth_state')
-      sessionStorage.removeItem('oauth_redirect_uri')
-      sessionStorage.removeItem('oauth_client_id')
-      sessionStorage.removeItem('oauth_code_verifier')
-      
-      throw error
-    }
-  }
-
-  // MÉTODO CORRIGIDO: exchangeCodeForToken com melhor tratamento de resposta
-  private async exchangeCodeForToken(code: string, redirectUri: string, codeVerifier: string): Promise<TokenResponse> {
-    try {
-      console.log('Trocando código por token com PKCE...')
-      
-      const requestData = {
-        code: code,
-        redirectUri: redirectUri,
-        codeVerifier: codeVerifier
-      }
-      
-      console.log('Dados da requisição token:', {
-        code: code.substring(0, 10) + '...',
-        redirectUri: redirectUri,
-        codeVerifier: codeVerifier.substring(0, 8) + '...'
-      })
-      
-      const response = await fetch('/api/auth/callback', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestData)
-      })
-      
-      let responseData
-      try {
-        responseData = await response.json()
-      } catch (e) {
-        throw new Error(`Resposta inválida do servidor: ${response.status} ${response.statusText}`)
-      }
-      
-      if (!response.ok) {
-        const errorMessage = responseData.error_description || responseData.error || `HTTP ${response.status}: ${response.statusText}`
-        
-        console.error('Erro na troca código->token:', {
-          status: response.status,
-          error: responseData.error,
-          error_description: responseData.error_description,
-          responseData
-        })
-        
-        // Mapear erros comuns
-        switch (responseData.error) {
-          case 'invalid_request':
-            throw new Error('Requisição inválida - verifique configuração do Keycloak')
-          case 'invalid_client':
-            throw new Error('Cliente inválido - verifique client ID e secret')
-          case 'invalid_grant':
-            throw new Error('Código de autorização inválido ou expirado')
-          case 'unauthorized_client':
-            throw new Error('Cliente não autorizado')
-          default:
-            throw new Error(errorMessage)
-        }
-      }
-      
-      if (!responseData.access_token) {
-        throw new Error('Token de acesso não encontrado na resposta')
-      }
-      
-      console.log('Token recebido com sucesso:', {
-        token_type: responseData.token_type,
-        expires_in: responseData.expires_in,
-        has_refresh_token: !!responseData.refresh_token
-      })
       
       return responseData
       
@@ -288,7 +258,7 @@ export class AuthService {
     return this.base64URLEncode(array)
   }
 
-  // Métodos públicos necessários para o store
+  // Métodos públicos necessários para o store e api.ts
   getAccessToken(): string | null {
     return localStorage.getItem('access_token')
   }

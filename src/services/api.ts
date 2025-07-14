@@ -1,258 +1,289 @@
-// src/services/api.ts - Versão corrigida
+import axios, { AxiosError } from 'axios'
+import type { 
+  AxiosInstance, 
+  AxiosRequestConfig, 
+  AxiosResponse,
+  InternalAxiosRequestConfig 
+} from 'axios'
+import { useAuthStore } from '@/stores/auth'
+import authService from '@/services/auth'
+import { APP_CONFIG } from '@/utils/constants'
 
-import axios from 'axios'
-import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
+// Configuração base do axios
+const apiClient: AxiosInstance = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8082/api',
+  timeout: APP_CONFIG.API.TIMEOUT_MS,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+})
 
-// Configuração base da API
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8082/api'
+// Interceptor de requisição para adicionar o token
+apiClient.interceptors.request.use(
+  (config: InternalAxiosRequestConfig) => {
+    // Obter token do authService em vez do store
+    const token = authService.getAccessToken()
+    
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
 
-export class ApiService {
-  private api: AxiosInstance
-  private baseURL: string
-  private isRefreshing = false
-  private failedQueue: Array<{
-    resolve: (value?: any) => void
-    reject: (error?: any) => void
-  }> = []
-
-  constructor() {
-    this.baseURL = API_BASE_URL
-    this.api = axios.create({
-      baseURL: this.baseURL,
-      timeout: 10000,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-
-    this.setupInterceptors()
+    // Log da requisição em desenvolvimento
+    if (import.meta.env.DEV) {
+      console.log('API Request:', {
+        method: config.method?.toUpperCase(),
+        url: config.url,
+        params: config.params,
+        data: config.data
+      })
+    }
+    
+    return config
+  },
+  (error) => {
+    console.error('Erro no interceptor de requisição:', error)
+    return Promise.reject(error)
   }
+)
 
-  private setupInterceptors(): void {
-    // Request interceptor para adicionar token de autenticação
-    this.api.interceptors.request.use(
-      (config) => {
-        // Adicionar token se disponível
-        const token = localStorage.getItem('access_token')
-        if (token) {
-          config.headers.Authorization = `Bearer ${token}`
-        }
-        return config
-      },
-      (error) => {
-        return Promise.reject(error)
-      }
-    )
+// Interceptor de resposta para tratar erros e renovar tokens
+apiClient.interceptors.response.use(
+  (response: AxiosResponse) => {
+    // Log da resposta em desenvolvimento
+    if (import.meta.env.DEV) {
+      console.log('API Response:', {
+        status: response.status,
+        url: response.config.url,
+        data: response.data
+      })
+    }
+    
+    return response
+  },
+  async (error: AxiosError) => {
+    const authStore = useAuthStore()
+    const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean }
 
-    // Response interceptor para tratamento de erros
-    this.api.interceptors.response.use(
-      (response: AxiosResponse) => response,
-      async (error) => {
-        const originalRequest = error.config
+    // Log do erro em desenvolvimento
+    if (import.meta.env.DEV) {
+      console.error('API Error:', {
+        status: error.response?.status,
+        url: error.config?.url,
+        method: error.config?.method?.toUpperCase(),
+        data: error.response?.data,
+        message: error.message
+      })
+    }
 
-        // Se token expirou (401) e não é uma tentativa de refresh
-        if (error.response?.status === 401 && !originalRequest._retry) {
-          
-          // CORREÇÃO: Verificar se é endpoint de validação - não tentar refresh
-          if (originalRequest.url?.includes('/auth/validate')) {
-            console.log('Erro 401 no endpoint de validação - token provavelmente inválido')
-            return Promise.reject(error)
-          }
+    // Se o token expirou (401) e ainda não tentamos renovar
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true
 
-          // CORREÇÃO: Verificar se é callback - não tentar refresh  
-          if (originalRequest.url?.includes('/auth/callback')) {
-            console.log('Erro 401 no callback - não fazer refresh')
-            return Promise.reject(error)
-          }
-
-          // Se já está fazendo refresh, enfileirar requisição
-          if (this.isRefreshing) {
-            return new Promise((resolve, reject) => {
-              this.failedQueue.push({ resolve, reject })
-            }).then(() => {
-              const newToken = localStorage.getItem('access_token')
-              if (newToken) {
-                originalRequest.headers.Authorization = `Bearer ${newToken}`
-                return this.api(originalRequest)
-              }
-              return Promise.reject(error)
-            }).catch(err => {
-              return Promise.reject(err)
-            })
-          }
-
-          originalRequest._retry = true
-          this.isRefreshing = true
-
-          try {
-            // Verificar se temos refresh token
-            const refreshToken = localStorage.getItem('refresh_token')
-            if (refreshToken) {
-              // Tentar renovar token
-              const success = await this.refreshAccessToken(refreshToken)
-              if (success) {
-                // Processar fila de requisições falhadas
-                this.processQueue(null)
-                
-                // Retry da requisição original com novo token
-                const newToken = localStorage.getItem('access_token')
-                if (newToken) {
-                  originalRequest.headers.Authorization = `Bearer ${newToken}`
-                  return this.api(originalRequest)
-                }
-              }
-            }
-            
-            // Se não conseguiu renovar, limpar tokens e processar fila
-            this.processQueue(error)
-            this.clearTokensAndRedirect()
-            
-          } catch (refreshError) {
-            console.error('Erro ao renovar token:', refreshError)
-            this.processQueue(refreshError)
-            this.clearTokensAndRedirect()
-          } finally {
-            this.isRefreshing = false
+      try {
+        console.log('Token expirado, tentando renovar...')
+        
+        // Usar método do authService para renovar token
+        const refreshSuccess = await authService.refreshToken()
+        
+        if (refreshSuccess) {
+          // Reenviar a requisição original com o novo token
+          const newToken = authService.getAccessToken()
+          if (originalRequest && newToken) {
+            originalRequest.headers.Authorization = `Bearer ${newToken}`
+            return apiClient(originalRequest)
           }
         }
-
+        
+        // Se não conseguiu renovar, fazer logout
+        await authStore.logout()
+        return Promise.reject(error)
+        
+      } catch (refreshError) {
+        console.error('Erro ao renovar token:', refreshError)
+        await authStore.logout()
         return Promise.reject(error)
       }
-    )
+    }
+
+    // Processar outros tipos de erro
+    const processedError = processApiError(error)
+    return Promise.reject(processedError)
+  }
+)
+
+// Função para processar e padronizar erros da API
+function processApiError(error: AxiosError): AxiosError {
+  const response = error.response
+  
+  if (!response) {
+    // Erro de rede
+    error.message = 'Erro de conexão. Verifique sua internet.'
+    error.code = 'NETWORK_ERROR'
+    return error
   }
 
-  // CORREÇÃO: Método para processar fila de requisições
-  private processQueue(error: any): void {
-    this.failedQueue.forEach(({ resolve, reject }) => {
-      if (error) {
-        reject(error)
-      } else {
-        resolve()
-      }
-    })
-    
-    this.failedQueue = []
+  // Extrair mensagem de erro do backend
+  const backendMessage = (response.data as any)?.error || 
+                        (response.data as any)?.message || 
+                        response.statusText
+
+  switch (response.status) {
+    case 400:
+      error.message = backendMessage || 'Dados inválidos'
+      break
+    case 401:
+      error.message = 'Não autorizado. Faça login novamente.'
+      break
+    case 403:
+      error.message = 'Acesso negado'
+      break
+    case 404:
+      error.message = 'Recurso não encontrado'
+      break
+    case 409:
+      error.message = backendMessage || 'Conflito de dados'
+      break
+    case 422:
+      error.message = backendMessage || 'Dados inválidos'
+      break
+    case 500:
+      error.message = 'Erro interno do servidor'
+      break
+    case 503:
+      error.message = 'Serviço temporariamente indisponível'
+      break
+    default:
+      error.message = backendMessage || 'Erro desconhecido'
   }
 
-  // Método para tentar renovar o access token - CORRIGIDO
-private async refreshAccessToken(refreshToken: string): Promise<boolean> {
-  try {
-    console.log('Tentando renovar access token...')
-    
-    // CORREÇÃO: Enviar como application/x-www-form-urlencoded
-    const formData = new URLSearchParams()
-    formData.append('refresh_token', refreshToken)
-    
-    const response = await axios.post(`${this.baseURL}/auth/refresh`, formData, {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'  // ✅ Content-Type correto
-      },
-      timeout: 5000 // Timeout menor para refresh
-    })
+  return error
+}
 
-    if (response.data?.access_token) {
-      // Armazenar novo token
-      localStorage.setItem('access_token', response.data.access_token)
+// Interface para opções de requisição customizada
+interface RequestConfig extends AxiosRequestConfig {
+  skipAuth?: boolean
+  retries?: number
+}
+
+// Serviço principal da API
+const apiService = {
+  // GET
+  async get<T = any>(url: string, config?: RequestConfig): Promise<T> {
+    try {
+      const response = await apiClient.get<T>(url, config)
+      return response.data
+    } catch (error) {
+      console.error(`Erro GET ${url}:`, error)
+      throw error
+    }
+  },
+
+  // POST
+  async post<T = any>(url: string, data?: any, config?: RequestConfig): Promise<T> {
+    try {
+      const response = await apiClient.post<T>(url, data, config)
+      return response.data
+    } catch (error) {
+      console.error(`Erro POST ${url}:`, error)
+      throw error
+    }
+  },
+
+  // PUT
+  async put<T = any>(url: string, data?: any, config?: RequestConfig): Promise<T> {
+    try {
+      const response = await apiClient.put<T>(url, data, config)
+      return response.data
+    } catch (error) {
+      console.error(`Erro PUT ${url}:`, error)
+      throw error
+    }
+  },
+
+  // PATCH
+  async patch<T = any>(url: string, data?: any, config?: RequestConfig): Promise<T> {
+    try {
+      const response = await apiClient.patch<T>(url, data, config)
+      return response.data
+    } catch (error) {
+      console.error(`Erro PATCH ${url}:`, error)
+      throw error
+    }
+  },
+
+  // DELETE
+  async delete<T = any>(url: string, config?: RequestConfig): Promise<T> {
+    try {
+      const response = await apiClient.delete<T>(url, config)
+      return response.data
+    } catch (error) {
+      console.error(`Erro DELETE ${url}:`, error)
+      throw error
+    }
+  },
+
+  // Upload de arquivo
+  async upload<T = any>(url: string, file: File, config?: RequestConfig): Promise<T> {
+    const formData = new FormData()
+    formData.append('file', file)
+
+    try {
+      const response = await apiClient.post<T>(url, formData, {
+        ...config,
+        headers: {
+          ...config?.headers,
+          'Content-Type': 'multipart/form-data',
+        },
+      })
+      return response.data
+    } catch (error) {
+      console.error(`Erro UPLOAD ${url}:`, error)
+      throw error
+    }
+  },
+
+  // Download de arquivo
+  async download(url: string, filename?: string, config?: RequestConfig): Promise<void> {
+    try {
+      const response = await apiClient.get(url, {
+        ...config,
+        responseType: 'blob',
+      })
+
+      // Criar URL temporária para download
+      const blob = new Blob([response.data])
+      const downloadUrl = window.URL.createObjectURL(blob)
       
-      if (response.data.refresh_token) {
-        localStorage.setItem('refresh_token', response.data.refresh_token)
-      }
+      // Criar elemento de link temporário para forçar download
+      const link = document.createElement('a')
+      link.href = downloadUrl
+      link.download = filename || 'download'
+      document.body.appendChild(link)
+      link.click()
       
-      // Calcular nova expiração
-      const expiresIn = response.data.expires_in || 3600
-      const expiresAt = Date.now() + (expiresIn * 1000)
-      localStorage.setItem('token_expires_at', expiresAt.toString())
-      
-      console.log('Token renovado com sucesso')
+      // Limpar
+      document.body.removeChild(link)
+      window.URL.revokeObjectURL(downloadUrl)
+    } catch (error) {
+      console.error(`Erro DOWNLOAD ${url}:`, error)
+      throw error
+    }
+  },
+
+  // Verificar conectividade
+  async healthCheck(): Promise<boolean> {
+    try {
+      await this.get('/health', { timeout: 5000 })
       return true
+    } catch {
+      return false
     }
-    
-    return false
-  } catch (error) {
-    console.error('Erro ao renovar token:', error)
-    return false
+  },
+
+  // Obter instância do axios para uso avançado
+  getInstance(): AxiosInstance {
+    return apiClient
   }
 }
 
-  // Limpar tokens e redirecionar para login
-  private clearTokensAndRedirect(): void {
-    console.log('Limpando tokens e redirecionando para login...')
-    
-    localStorage.removeItem('access_token')
-    localStorage.removeItem('refresh_token')
-    localStorage.removeItem('token_expires_at')
-    localStorage.removeItem('user_info')
-    
-    // CORREÇÃO: Não redirecionar imediatamente se estivermos no callback
-    if (!window.location.pathname.includes('/auth/callback')) {
-      // Redirecionar para login após um pequeno delay
-      setTimeout(() => {
-        window.location.href = '/login'
-      }, 1000)
-    }
-  }
-
-  // Métodos HTTP públicos
-  async get<T = any>(url: string, config?: AxiosRequestConfig): Promise<T> {
-    const response = await this.api.get<T>(url, config)
-    return response.data
-  }
-
-  async post<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
-    const response = await this.api.post<T>(url, data, config)
-    return response.data
-  }
-
-  async put<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
-    const response = await this.api.put<T>(url, data, config)
-    return response.data
-  }
-
-  async patch<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
-    const response = await this.api.patch<T>(url, data, config)
-    return response.data
-  }
-
-  async delete<T = any>(url: string, config?: AxiosRequestConfig): Promise<T> {
-    const response = await this.api.delete<T>(url, config)
-    return response.data
-  }
-
-  // Método para fazer requisições sem interceptors (útil para debugging)
-  async rawRequest<T = any>(config: AxiosRequestConfig): Promise<T> {
-    const response = await axios.request<T>({
-      ...config,
-      baseURL: this.baseURL
-    })
-    return response.data
-  }
-
-  // Método para obter instância do axios (para casos especiais)
-  getAxiosInstance(): AxiosInstance {
-    return this.api
-  }
-
-  // Método para configurar token manualmente
-  setAuthToken(token: string): void {
-    this.api.defaults.headers.common['Authorization'] = `Bearer ${token}`
-  }
-
-  // Método para remover token
-  removeAuthToken(): void {
-    delete this.api.defaults.headers.common['Authorization']
-  }
-
-  // NOVO: Método para verificar se uma URL deve ser ignorada pelos interceptors
-  private shouldIgnoreAuth(url: string): boolean {
-    const ignoredEndpoints = [
-      '/auth/login-info',
-      '/auth/callback'
-    ]
-    
-    return ignoredEndpoints.some(endpoint => url.includes(endpoint))
-  }
-}
-
-// Instância singleton
-const apiService = new ApiService()
 export default apiService
