@@ -26,6 +26,7 @@
             @click="showGerarModal = true"
             :disabled="mensalidadesStore.loading"
           >
+          <!--  :disabled="mensalidadesStore.loading" -->
             <PlusIcon class="h-4 w-4 mr-2" />
             Gerar Cobranças
           </BaseButton>
@@ -126,6 +127,7 @@
       @close="showQRModal = false"
     />
   </AppLayout>
+
 </template>
 
 <script setup lang="ts">
