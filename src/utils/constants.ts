@@ -56,7 +56,7 @@ export const API_ENDPOINTS = {
     UPDATE: (id: string) => `/mensalidades/${id}`,
     DELETE: (id: string) => `/mensalidades/${id}`,
     RESUMO: '/mensalidades/resumo', // ADICIONADO
-    GERAR_COBRANCAS: '/mensalidades/gerar', // CORRIGIDO - era /mensalidades/gerar-cobrancas
+    GERAR_COBRANCAS: '/mensalidades/gerar-cobrancas', 
     QRCODE: (id: string) => `/mensalidades/${id}/qrcode`, // ADICIONADO
   },
   

@@ -59,36 +59,36 @@
 
     <!-- Conteúdo principal -->
     <div v-else class="space-y-6">
-      <!-- Cards de Resumo -->
-      <div v-if="mensalidadesStore.resumo" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <!-- Cards de Resumo - CORRIGIDO: Removido v-if e adicionado valores padrão -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <CardResumo
           titulo="Total de Associados"
-          :valor="mensalidadesStore.resumo.totalAssociados"
+          :valor="mensalidadesStore.resumo?.totalAssociados || 0"
           :icon="UsersIcon"
           icon-color="text-blue-500"
         />
         
         <CardResumo
           titulo="Mensalidades Pagas"
-          :valor="mensalidadesStore.resumo.pagas"
+          :valor="mensalidadesStore.resumo?.pagas || 0"
           :icon="CheckCircleIcon"
           icon-color="text-green-500"
-          :porcentagem="calcularPorcentagem(mensalidadesStore.resumo.pagas, mensalidadesStore.resumo.totalAssociados)"
+          :porcentagem="calcularPorcentagem(mensalidadesStore.resumo?.pagas || 0, mensalidadesStore.resumo?.totalAssociados || 0)"
           porcentagem-color="text-green-600"
         />
         
         <CardResumo
           titulo="Pendentes"
-          :valor="mensalidadesStore.resumo.pendentes"
+          :valor="mensalidadesStore.resumo?.pendentes || 0"
           :icon="ClockIcon"
           icon-color="text-yellow-500"
-          :porcentagem="calcularPorcentagem(mensalidadesStore.resumo.pendentes, mensalidadesStore.resumo.totalAssociados)"
+          :porcentagem="calcularPorcentagem(mensalidadesStore.resumo?.pendentes || 0, mensalidadesStore.resumo?.totalAssociados || 0)"
           porcentagem-color="text-yellow-600"
         />
         
         <CardResumo
           titulo="Valor Arrecadado"
-          :valor="formatters.money(mensalidadesStore.resumo.valorArrecadado)"
+          :valor="formatters.money(mensalidadesStore.resumo?.valorArrecadado || 0)"
           :icon="BanknotesIcon"
           icon-color="text-green-500"
         />
@@ -183,7 +183,7 @@ async function gerarCobrancas() {
     const resultado = await mensalidadesStore.gerarCobrancas()
     showGerarModal.value = false
     
-    successMessage.value = resultado.mensagem
+    successMessage.value = resultado.mensagem || 'Cobranças geradas com sucesso!'
     showSuccessAlert.value = true
     
   } catch (error) {
@@ -200,7 +200,7 @@ function abrirModalQRCode(mensalidade: Mensalidade) {
 async function marcarComoPaga(mensalidade: Mensalidade) {
   if (confirm(`Confirma que a mensalidade de ${mensalidade.nomeAssociado} foi paga?`)) {
     try {
-      // Implementar chamada para marcar como paga
+      // TODO: Implementar chamada para marcar como paga
       console.log('Marcar como paga:', mensalidade)
       
       // Por enquanto, simular sucesso
@@ -218,18 +218,30 @@ async function marcarComoPaga(mensalidade: Mensalidade) {
 
 // Carregar associados se necessário
 onMounted(async () => {
-  if (associadosStore.associados.length === 0) {
-    await associadosStore.fetchAssociados()
+  try {
+    // Carregar associados primeiro se necessário
+    if (associadosStore.associados.length === 0) {
+      await associadosStore.fetchAssociados()
+    }
+    
+    // Carregar dados das mensalidades
+    await mensalidadesStore.carregarDados()
+  } catch (error) {
+    console.error('Erro ao carregar dados iniciais:', error)
   }
-  await mensalidadesStore.carregarDados()
 })
 
 // Recarregar quando o período mudar
 watch(
   () => mensalidadesStore.periodoSelecionado,
-  () => {
-    if (associadosStore.associados.length === 0) {
-      associadosStore.fetchAssociados()
+  async () => {
+    try {
+      // Carregar associados se necessário
+      if (associadosStore.associados.length === 0) {
+        await associadosStore.fetchAssociados()
+      }
+    } catch (error) {
+      console.error('Erro ao carregar associados:', error)
     }
   },
   { deep: true }
