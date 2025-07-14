@@ -1,5 +1,5 @@
 import apiService from './api'
-import type { Usuario } from './types'
+import type { User } from './types'
 
 export interface LoginInfo {
   authServerUrl: string
@@ -8,7 +8,7 @@ export interface LoginInfo {
   loginUrl: string
 }
 
-export interface UserInfo extends Usuario {
+export interface UserInfo extends User {
   subject: string
   tokenExpiry: number
   issuedAt: number
@@ -52,4 +52,9 @@ export class AuthService {
   }
 }
 
-export const authService = new AuthService()
+// Exportação da instância como default
+const authService = new AuthService()
+export default authService
+
+// Exportação nomeada para compatibilidade
+export { authService }
