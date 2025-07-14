@@ -1,4 +1,4 @@
-import { apiService } from './api'
+import apiService from './api'
 import { API_ENDPOINTS } from '@/utils/constants'
 import type { 
   Mensalidade, 
