@@ -1,4 +1,53 @@
 /* Importação das fontes */
+/*@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');*/
+
+/* Fontes locais com fallback para Google Fonts */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url('/fonts/inter/inter-v13-latin-300.woff2') format('woff2'),
+       url('/fonts/inter/inter-v13-latin-300.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/inter/inter-v13-latin-regular.woff2') format('woff2'),
+       url('/fonts/inter/inter-v13-latin-regular.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/inter/inter-v13-latin-500.woff2') format('woff2'),
+       url('/fonts/inter/inter-v13-latin-500.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/inter/inter-v13-latin-600.woff2') format('woff2'),
+       url('/fonts/inter/inter-v13-latin-600.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/inter/inter-v13-latin-700.woff2') format('woff2'),
+       url('/fonts/inter/inter-v13-latin-700.woff') format('woff');
+}
+
+/* Fallback para Google Fonts se local falhar */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 /* Reset e estilos base */
