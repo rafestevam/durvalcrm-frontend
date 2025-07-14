@@ -26,6 +26,14 @@ export const formatters = {
     }).format(value)
   },
 
+  // Alias para currency - para compatibilidade
+  money: (value: number): string => {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    }).format(value)
+  },
+
   // Formatar data
   date: (value: string | Date): string => {
     const date = typeof value === 'string' ? new Date(value) : value
