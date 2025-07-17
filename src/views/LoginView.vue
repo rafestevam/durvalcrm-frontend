@@ -1,6 +1,9 @@
 <template>
   <div class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
+      <div class="flex justify-center">
+        <img class="w-25 h-25" style="width: 100px; height: 100px;" src="/img/logodurvalcrm-nobg.png" alt="DurvalCRM" />
+      </div>
       <h2 class="mt-6 text-center text-4xl font-bold tracking-tight text-blue-600">
         DurvalCRM
       </h2>
