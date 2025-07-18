@@ -165,25 +165,21 @@ export const mensalidadeService = {
    */
   async marcarComoPaga(id: string, dadosPagamento?: {
     dataPagamento?: string
-    valorPago?: number
     observacao?: string
-  }): Promise<Mensalidade> {
+  }): Promise<void> {
     try {
       validarId(id)
       
       const dados = {
-        status: 'PAGA',
         dataPagamento: dadosPagamento?.dataPagamento || new Date().toISOString(),
-        valorPago: dadosPagamento?.valorPago,
         observacao: dadosPagamento?.observacao
       }
       
-      const response = await apiService.patch<Mensalidade>(
-        API_ENDPOINTS.MENSALIDADES.UPDATE(id), 
+      await apiService.patch<void>(
+        `/api/mensalidades/${id}/pagar`, 
         dados
       )
       
-      return response
     } catch (error) {
       console.error(`Erro ao marcar mensalidade ${id} como paga:`, error)
       throw error

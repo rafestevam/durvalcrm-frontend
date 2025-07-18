@@ -71,10 +71,10 @@
         
         <CardResumo
           titulo="Mensalidades Pagas"
-          :valor="mensalidadesStore.resumo?.pagas || 0"
+          :valor="mensalidadesStore.resumo?.totalPagas || 0"
           :icon="CheckCircleIcon"
           icon-color="text-green-500"
-          :porcentagem="calcularPorcentagem(mensalidadesStore.resumo?.pagas || 0, mensalidadesStore.resumo?.totalAssociados || 0)"
+          :porcentagem="calcularPorcentagem(mensalidadesStore.resumo?.totalPagas || 0, mensalidadesStore.resumo?.totalAssociados || 0)"
           porcentagem-color="text-green-600"
         />
         
@@ -156,14 +156,19 @@ import { useMensalidadesStore } from '@/stores/mensalidades'
 import { useAssociadosStore } from '@/stores/associados'
 import { formatters } from '@/utils/formatters'
 import type { Mensalidade } from '@/services/types'
+import { mensalidadeService } from '@/services/mensalidade'
 
 const mensalidadesStore = useMensalidadesStore()
 const associadosStore = useAssociadosStore()
 
+// Refs para alertas
+const errorMessage = ref('')
+const showErrorAlert = ref(false)
+const successMessage = ref('')
+const showSuccessAlert = ref(false)
+
 const showGerarModal = ref(false)
 const showQRModal = ref(false)
-const showSuccessAlert = ref(false)
-const successMessage = ref('')
 const mensalidadeSelecionada = ref<Mensalidade | null>(null)
 
 // Computed para combinar mensalidades com nomes dos associados
@@ -202,10 +207,8 @@ function abrirModalQRCode(mensalidade: Mensalidade) {
 async function marcarComoPaga(mensalidade: Mensalidade) {
   if (confirm(`Confirma que a mensalidade de ${mensalidade.nomeAssociado} foi paga?`)) {
     try {
-      // TODO: Implementar chamada para marcar como paga
-      console.log('Marcar como paga:', mensalidade)
+      await mensalidadeService.marcarComoPaga(mensalidade.id)
       
-      // Por enquanto, simular sucesso
       successMessage.value = 'Mensalidade marcada como paga com sucesso!'
       showSuccessAlert.value = true
       
@@ -214,6 +217,8 @@ async function marcarComoPaga(mensalidade: Mensalidade) {
       
     } catch (error) {
       console.error('Erro ao marcar como paga:', error)
+      errorMessage.value = 'Erro ao marcar mensalidade como paga. Tente novamente.'
+      showErrorAlert.value = true
     }
   }
 }
