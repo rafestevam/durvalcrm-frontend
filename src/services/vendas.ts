@@ -33,7 +33,7 @@ export const vendaService = {
    */
   async criar(venda: Omit<Venda, 'id' | 'dataVenda' | 'criadoEm' | 'atualizadoEm'>): Promise<Venda> {
     try {
-      const response = await apiService.post<Venda>('/api/vendas', venda)
+      const response = await apiService.post<Venda>('/vendas', venda)
       return response
     } catch (error) {
       console.error('Erro ao criar venda:', error)
@@ -47,7 +47,7 @@ export const vendaService = {
   async buscarPorId(id: string): Promise<Venda> {
     try {
       validarId(id)
-      const response = await apiService.get<Venda>(`/api/vendas/${id}`)
+      const response = await apiService.get<Venda>(`/vendas/${id}`)
       return response
     } catch (error) {
       console.error(`Erro ao buscar venda ${id}:`, error)
@@ -61,7 +61,7 @@ export const vendaService = {
   async atualizar(id: string, venda: Omit<Venda, 'id' | 'dataVenda' | 'criadoEm' | 'atualizadoEm'>): Promise<Venda> {
     try {
       validarId(id)
-      const response = await apiService.put<Venda>(`/api/vendas/${id}`, venda)
+      const response = await apiService.put<Venda>(`/vendas/${id}`, venda)
       return response
     } catch (error) {
       console.error(`Erro ao atualizar venda ${id}:`, error)
@@ -75,7 +75,7 @@ export const vendaService = {
   async deletar(id: string): Promise<void> {
     try {
       validarId(id)
-      await apiService.delete(`/api/vendas/${id}`)
+      await apiService.delete(`/vendas/${id}`)
     } catch (error) {
       console.error(`Erro ao deletar venda ${id}:`, error)
       throw error
@@ -87,7 +87,7 @@ export const vendaService = {
    */
   async listarTodas(): Promise<Venda[]> {
     try {
-      const response = await apiService.get<Venda[]>('/api/vendas')
+      const response = await apiService.get<Venda[]>('/vendas')
       return response
     } catch (error) {
       console.error('Erro ao listar vendas:', error)
@@ -101,7 +101,7 @@ export const vendaService = {
   async listarPorPeriodo(dataInicio: string, dataFim: string): Promise<Venda[]> {
     try {
       validarPeriodo(dataInicio, dataFim)
-      const response = await apiService.get<Venda[]>(`/api/vendas/periodo?dataInicio=${dataInicio}&dataFim=${dataFim}`)
+      const response = await apiService.get<Venda[]>(`/vendas/periodo?dataInicio=${dataInicio}&dataFim=${dataFim}`)
       return response
     } catch (error) {
       console.error('Erro ao listar vendas por período:', error)
@@ -115,7 +115,7 @@ export const vendaService = {
   async listarPorAssociado(associadoId: string): Promise<Venda[]> {
     try {
       validarId(associadoId)
-      const response = await apiService.get<Venda[]>(`/api/vendas/associado/${associadoId}`)
+      const response = await apiService.get<Venda[]>(`/vendas/associado/${associadoId}`)
       return response
     } catch (error) {
       console.error(`Erro ao listar vendas do associado ${associadoId}:`, error)
@@ -128,7 +128,7 @@ export const vendaService = {
    */
   async listarPorOrigem(origem: 'CANTINA' | 'BAZAR' | 'LIVROS'): Promise<Venda[]> {
     try {
-      const response = await apiService.get<Venda[]>(`/api/vendas/origem/${origem}`)
+      const response = await apiService.get<Venda[]>(`/vendas/origem/${origem}`)
       return response
     } catch (error) {
       console.error(`Erro ao listar vendas da origem ${origem}:`, error)
@@ -141,7 +141,7 @@ export const vendaService = {
    */
   async listarRecentes(): Promise<Venda[]> {
     try {
-      const response = await apiService.get<Venda[]>('/api/vendas/recentes')
+      const response = await apiService.get<Venda[]>('/vendas/recentes')
       return response
     } catch (error) {
       console.error('Erro ao listar vendas recentes:', error)
@@ -155,7 +155,7 @@ export const vendaService = {
   async obterResumo(dataInicio: string, dataFim: string): Promise<ResumoVendas> {
     try {
       validarPeriodo(dataInicio, dataFim)
-      const response = await apiService.get<ResumoVendas>(`/api/vendas/resumo?dataInicio=${dataInicio}&dataFim=${dataFim}`)
+      const response = await apiService.get<ResumoVendas>(`/vendas/resumo?dataInicio=${dataInicio}&dataFim=${dataFim}`)
       return response
     } catch (error) {
       console.error('Erro ao obter resumo de vendas:', error)
@@ -169,7 +169,7 @@ export const vendaService = {
   async obterResumoPorOrigem(origem: 'CANTINA' | 'BAZAR' | 'LIVROS', dataInicio: string, dataFim: string): Promise<ResumoVendas> {
     try {
       validarPeriodo(dataInicio, dataFim)
-      const response = await apiService.get<ResumoVendas>(`/api/vendas/resumo/origem/${origem}?dataInicio=${dataInicio}&dataFim=${dataFim}`)
+      const response = await apiService.get<ResumoVendas>(`/vendas/resumo/origem/${origem}?dataInicio=${dataInicio}&dataFim=${dataFim}`)
       return response
     } catch (error) {
       console.error(`Erro ao obter resumo de vendas da origem ${origem}:`, error)

@@ -176,7 +176,7 @@ export const mensalidadeService = {
       }
       
       await apiService.patch<void>(
-        `/api/mensalidades/${id}/pagar`, 
+        `/mensalidades/${id}/pagar`, 
         dados
       )
       
