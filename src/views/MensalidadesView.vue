@@ -80,10 +80,10 @@
         
         <CardResumo
           titulo="Pendentes"
-          :valor="mensalidadesStore.resumo?.pendentes || 0"
+          :valor="mensalidadesStore.resumo?.totalPendentes || 0"
           :icon="ClockIcon"
           icon-color="text-yellow-500"
-          :porcentagem="calcularPorcentagem(mensalidadesStore.resumo?.pendentes || 0, mensalidadesStore.resumo?.totalAssociados || 0)"
+          :porcentagem="calcularPorcentagem(mensalidadesStore.resumo?.totalPendentes || 0, mensalidadesStore.resumo?.totalAssociados || 0)"
           porcentagem-color="text-yellow-600"
         />
         
