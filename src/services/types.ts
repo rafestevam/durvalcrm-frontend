@@ -1,4 +1,4 @@
-import type Keycloak from 'keycloak-js'
+// src/services/types.ts
 
 // Tipos de dados da aplicação
 export interface Associado {
@@ -50,16 +50,27 @@ export interface ApiError {
   errors?: Record<string, string[]>
 }
 
+export enum StatusMensalidade {
+  PENDENTE = 'PENDENTE',
+  PAGA = 'PAGA',
+  ATRASADA = 'ATRASADA'
+}
+
+// Interface única para Mensalidade (removendo duplicação)
 export interface Mensalidade {
   id: string
   associadoId: string
   associado?: Associado
+  nomeAssociado?: string
   mesReferencia: number
   anoReferencia: number
   valor: number
-  status: 'PENDENTE' | 'PAGA' | 'ATRASADA'
+  status: StatusMensalidade
   dataVencimento: string
   dataPagamento?: string
+  qrCodePix?: string
+  identificadorPix?: string
+  vencida?: boolean
 }
 
 export interface Venda {
@@ -79,10 +90,38 @@ export interface AlertMessage {
   show: boolean
 }
 
+// Interface corrigida para corresponder ao ResumoMensalidadesDTO do backend
+export interface ResumoMensalidades {
+  totalAssociados: number
+  totalPendentes: number
+  totalPagas: number
+  totalAtrasadas: number
+  valorTotalEsperado: number
+  valorArrecadado: number
+  valorPendente: number
+  valorAtrasado: number
+  percentualArrecadacao: number
+  mes: number
+  ano: number
+}
+
+export interface ResultadoGeracao {
+  cobrancasGeradas: number
+  jaExistiam: number
+  totalAssociados: number
+  mensagem: string
+}
+
+export interface PeriodoMensalidade {
+  mes: number
+  ano: number
+  label: string
+}
+
 // Tipos para Pinia stores
 export interface AuthState {
   user: User | null
-  keycloak: Keycloak | null
+  keycloak: any | null  // Usando 'any' para evitar dependência do keycloak-js
   token: string | null
   isAuthenticated: boolean
   loading: boolean
@@ -101,47 +140,4 @@ export interface KeycloakConfig {
   url: string
   realm: string
   clientId: string
-}
-
-export interface Mensalidade {
-  id: string
-  associadoId: string
-  nomeAssociado?: string
-  mesReferencia: number
-  anoReferencia: number
-  valor: number
-  status: StatusMensalidade
-  dataVencimento: string
-  dataPagamento?: string
-  qrCodePix: string
-  identificadorPix: string
-  vencida: boolean
-}
-
-export enum StatusMensalidade {
-  PENDENTE = 'PENDENTE',
-  PAGA = 'PAGA',
-  ATRASADA = 'ATRASADA'
-}
-
-export interface ResumoMensalidades {
-  totalAssociados: number
-  pagas: number
-  pendentes: number
-  atrasadas: number
-  valorArrecadado: number
-  valorPendente: number
-}
-
-export interface ResultadoGeracao {
-  cobrancasGeradas: number
-  jaExistiam: number
-  totalAssociados: number
-  mensagem: string
-}
-
-export interface PeriodoMensalidade {
-  mes: number
-  ano: number
-  label: string
 }

@@ -37,7 +37,7 @@
             </div>
             <div>
               <span class="text-gray-600">Já Possuem Cobrança:</span>
-              <span class="font-medium ml-2">{{ resumo.totalAssociados }}</span>
+              <span class="font-medium ml-2">{{ jaTemCobranca }}</span>
             </div>
           </div>
         </div>
@@ -94,6 +94,15 @@ const periodoFormatado = computed(() => {
     'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
   ]
   return `${meses[props.periodo.mes - 1]} ${props.periodo.ano}`
+})
+
+// Calcula quantos associados já têm cobrança gerada
+const jaTemCobranca = computed(() => {
+  if (!props.resumo) return 0
+  
+  // Se há mensalidades pagas, pendentes ou atrasadas, significa que já foram geradas
+  // Baseado no DTO do backend: totalPagas, totalPendentes, totalAtrasadas
+  return (props.resumo.totalPagas || 0) + (props.resumo.totalPendentes || 0) + (props.resumo.totalAtrasadas || 0)
 })
 
 function confirmarGeracao() {
