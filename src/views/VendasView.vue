@@ -13,6 +13,18 @@
       <div class="bg-white shadow rounded-lg">
         <div class="p-6">
           <form @submit.prevent="registrarVenda" class="space-y-6">
+            <!-- Descrição -->
+            <div>
+              <BaseInput
+                v-model="forma.descricao"
+                type="text"
+                label="Descrição da Venda"
+                placeholder="Ex: Lanche, Livro de História, etc."
+                required
+                :error="errors.descricao"
+              />
+            </div>
+
             <!-- Valor -->
             <div>
               <BaseInput
@@ -24,6 +36,26 @@
                 required
                 :error="errors.valor"
               />
+            </div>
+
+            <!-- Associado -->
+            <div>
+              <label class="form-label">Associado</label>
+              <select
+                v-model="forma.associadoId"
+                class="form-select"
+                required
+              >
+                <option value="">Selecione um associado</option>
+                <option 
+                  v-for="associado in associadosStore.associados" 
+                  :key="associado.id" 
+                  :value="associado.id"
+                >
+                  {{ associado.nomeCompleto }}
+                </option>
+              </select>
+              <p v-if="errors.associadoId" class="form-error">{{ errors.associadoId }}</p>
             </div>
 
             <!-- Origem -->
@@ -46,6 +78,17 @@
                 </button>
               </div>
               <p v-if="errors.origem" class="form-error">{{ errors.origem }}</p>
+            </div>
+
+            <!-- Observações -->
+            <div>
+              <label class="form-label">Observações (opcional)</label>
+              <textarea
+                v-model="forma.observacoes"
+                class="form-textarea"
+                rows="3"
+                placeholder="Observações sobre a venda..."
+              ></textarea>
             </div>
 
             <!-- Data (informativa) -->
@@ -76,20 +119,23 @@
         <div class="p-6">
           <h2 class="text-lg font-medium text-gray-900 mb-4">Vendas Recentes</h2>
           
-          <div v-if="vendasRecentes.length === 0" class="text-center py-4">
+          <div v-if="vendasStore.vendasRecentes.length === 0" class="text-center py-4">
             <ShoppingCartIcon class="w-12 h-12 mx-auto text-gray-400 mb-4" />
-            <p class="text-gray-600">Nenhuma venda registrada hoje</p>
+            <p class="text-gray-600">Nenhuma venda registrada recentemente</p>
           </div>
 
           <div v-else class="space-y-3">
             <div
-              v-for="venda in vendasRecentes"
+              v-for="venda in vendasStore.vendasRecentes"
               :key="venda.id"
               class="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
             >
               <div>
-                <p class="font-medium">{{ getOrigemLabel(venda.origem) }}</p>
-                <p class="text-sm text-gray-600">{{ formatters.datetime(venda.dataVenda) }}</p>
+                <p class="font-medium">{{ venda.descricao }}</p>
+                <p class="text-sm text-gray-600">
+                  {{ getOrigemLabel(venda.origem) }} - {{ venda.nomeAssociado }}
+                </p>
+                <p class="text-xs text-gray-500">{{ formatters.datetime(venda.dataVenda) }}</p>
               </div>
               <div class="text-lg font-semibold text-success-600">
                 {{ formatters.currency(venda.valor) }}
@@ -109,6 +155,16 @@
       :auto-hide="true"
       @dismiss="showSuccessAlert = false"
     />
+
+    <!-- Alerta de Erro -->
+    <AlertMessage
+      v-if="showErrorAlert"
+      type="error"
+      title="Erro ao Registrar Venda"
+      :message="errorMessage"
+      :auto-hide="true"
+      @dismiss="showErrorAlert = false"
+    />
   </AppLayout>
 </template>
 
@@ -121,28 +177,46 @@ import BaseInput from '@/components/common/BaseInput.vue'
 import AlertMessage from '@/components/common/AlertMessage.vue'
 import { formatters } from '@/utils/formatters'
 import { VENDA_ORIGENS } from '@/utils/constants'
+import { useVendasStore } from '@/stores/vendas'
+import { useAssociadosStore } from '@/stores/associados'
 import type { Venda } from '@/services/types'
 
+const vendasStore = useVendasStore()
+const associadosStore = useAssociadosStore()
+
 const forma = reactive({
+  descricao: '',
   valor: '',
   origem: '' as 'CANTINA' | 'BAZAR' | 'LIVROS' | '',
+  associadoId: '',
+  observacoes: '',
 })
 
 const errors = reactive({
+  descricao: '',
   valor: '',
   origem: '',
+  associadoId: '',
 })
 
 const isSubmitting = ref(false)
 const showSuccessAlert = ref(false)
-const vendasRecentes = ref<Venda[]>([])
+const errorMessage = ref('')
+const showErrorAlert = ref(false)
 
 function validateForm(): boolean {
   // Reset errors
+  errors.descricao = ''
   errors.valor = ''
   errors.origem = ''
+  errors.associadoId = ''
 
   let isValid = true
+
+  if (!forma.descricao || forma.descricao.trim() === '') {
+    errors.descricao = 'Descrição é obrigatória'
+    isValid = false
+  }
 
   if (!forma.valor || parseFloat(forma.valor) <= 0) {
     errors.valor = 'Digite um valor válido'
@@ -154,6 +228,11 @@ function validateForm(): boolean {
     isValid = false
   }
 
+  if (!forma.associadoId) {
+    errors.associadoId = 'Selecione um associado'
+    isValid = false
+  }
+
   return isValid
 }
 
@@ -162,29 +241,31 @@ async function registrarVenda() {
 
   try {
     isSubmitting.value = true
+    errorMessage.value = ''
+    showErrorAlert.value = false
 
-    // Simular chamada da API
-    const novaVenda: Venda = {
-      id: Date.now().toString(),
+    await vendasStore.criarVenda({
+      descricao: forma.descricao,
       valor: parseFloat(forma.valor),
       origem: forma.origem as 'CANTINA' | 'BAZAR' | 'LIVROS',
-      dataVenda: new Date().toISOString(),
-    }
-
-    // Adicionar à lista de vendas recentes
-    vendasRecentes.value.unshift(novaVenda)
+      associadoId: forma.associadoId,
+      observacoes: forma.observacoes || undefined,
+    })
 
     // Reset form
+    forma.descricao = ''
     forma.valor = ''
     forma.origem = ''
+    forma.associadoId = ''
+    forma.observacoes = ''
 
     // Mostrar sucesso
     showSuccessAlert.value = true
 
-    console.log('Venda registrada:', novaVenda)
   } catch (error) {
     console.error('Erro ao registrar venda:', error)
-    alert('Erro ao registrar venda')
+    errorMessage.value = 'Erro ao registrar venda. Tente novamente.'
+    showErrorAlert.value = true
   } finally {
     isSubmitting.value = false
   }
@@ -195,9 +276,15 @@ function getOrigemLabel(origem: string): string {
   return item?.label || origem
 }
 
-onMounted(() => {
-  // Carregar vendas recentes do dia
-  // Por enquanto, dados mockados
-  vendasRecentes.value = []
+onMounted(async () => {
+  try {
+    // Carregar associados e vendas recentes em paralelo
+    await Promise.all([
+      associadosStore.fetchAssociados(),
+      vendasStore.carregarVendasRecentes()
+    ])
+  } catch (error) {
+    console.error('Erro ao carregar dados:', error)
+  }
 })
 </script>

@@ -74,10 +74,35 @@ export interface Mensalidade {
 }
 
 export interface Venda {
-  id?: string
+  id: string
+  descricao: string
   valor: number
   origem: 'CANTINA' | 'BAZAR' | 'LIVROS'
   dataVenda: string
+  observacoes?: string
+  associadoId: string
+  nomeAssociado?: string
+  criadoEm: string
+  atualizadoEm?: string
+}
+
+export interface ResumoVendas {
+  dataInicio: string
+  dataFim: string
+  totalVendas: number
+  valorTotalVendas: number
+  valorMedioVenda: number
+  vendasCantina: number
+  vendasBazar: number
+  vendasLivros: number
+  valorCantina: number
+  valorBazar: number
+  valorLivros: number
+  percentualCantina: number
+  percentualBazar: number
+  percentualLivros: number
+  associadoMaisVendas?: string
+  vendasAssociadoTop?: number
 }
 
 export interface FormValidationErrors {
