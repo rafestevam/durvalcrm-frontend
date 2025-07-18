@@ -19,7 +19,14 @@
 
         <!-- QR Code -->
         <div class="flex justify-center">
-          <div class="bg-white p-4 rounded-lg border-2 border-gray-200">
+          <div v-if="loading" class="text-center py-8">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+            <p class="text-sm text-gray-600 mt-2">Gerando QR Code...</p>
+          </div>
+          <div v-else-if="error" class="text-center py-8">
+            <p class="text-sm text-red-600">{{ error }}</p>
+          </div>
+          <div v-else class="bg-white p-4 rounded-lg border-2 border-gray-200">
             <canvas ref="qrCanvas" class="mx-auto"></canvas>
           </div>
         </div>
@@ -32,7 +39,7 @@
           <div class="flex">
             <input
               ref="pixCodeInput"
-              :value="mensalidade.qrCodePix"
+              :value="qrCodeData"
               readonly
               class="flex-1 rounded-l-md border-gray-300 text-xs font-mono bg-gray-50"
             />
@@ -75,6 +82,7 @@ import { ref, computed, watch, nextTick } from 'vue'
 import BaseModal from '@/components/common/BaseModal.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 import { formatters } from '@/utils/formatters'
+import { mensalidadeService } from '@/services/mensalidade'
 import type { Mensalidade } from '@/services/types'
 
 interface Props {
@@ -92,6 +100,9 @@ const emit = defineEmits<Emits>()
 const qrCanvas = ref<HTMLCanvasElement>()
 const pixCodeInput = ref<HTMLInputElement>()
 const copiado = ref(false)
+const loading = ref(false)
+const error = ref('')
+const qrCodeData = ref('')
 
 const periodoFormatado = computed(() => {
   if (!props.mensalidade) return ''
@@ -102,13 +113,48 @@ const periodoFormatado = computed(() => {
   return `${meses[props.mensalidade.mesReferencia - 1]}/${props.mensalidade.anoReferencia}`
 })
 
+async function buscarQRCode() {
+  if (!props.mensalidade?.id) return
+  
+  loading.value = true
+  error.value = ''
+  
+  try {
+    // Se a mensalidade já tem QR Code, usar ele
+    if (props.mensalidade.qrCodePix) {
+      qrCodeData.value = props.mensalidade.qrCodePix
+    } else {
+      // Buscar QR Code via API
+      console.log('Buscando QR Code via API para mensalidade:', props.mensalidade.id)
+      qrCodeData.value = await mensalidadeService.obterQRCode(props.mensalidade.id)
+    }
+    
+    await nextTick()
+    await gerarQRCode()
+    
+  } catch (err) {
+    console.error('Erro ao buscar QR Code:', err)
+    error.value = 'QR Code não disponível para esta mensalidade'
+  } finally {
+    loading.value = false
+  }
+}
+
 async function gerarQRCode() {
-  if (!props.mensalidade?.qrCodePix || !qrCanvas.value) return
+  console.log('Gerando QR Code...')
+  console.log('QR Code Data:', qrCodeData.value)
+  console.log('Canvas:', qrCanvas.value)
+  
+  if (!qrCodeData.value || !qrCanvas.value) {
+    console.error('QR Code data ou canvas não disponível')
+    return
+  }
 
   try {
-    // Usar biblioteca QR Code (adicionar ao package.json: qrcode)
     const QRCode = await import('qrcode')
-    await QRCode.toCanvas(qrCanvas.value, props.mensalidade.qrCodePix, {
+    console.log('QRCode library loaded:', QRCode)
+    
+    await QRCode.toCanvas(qrCanvas.value, qrCodeData.value, {
       width: 200,
       margin: 2,
       color: {
@@ -116,16 +162,18 @@ async function gerarQRCode() {
         light: '#FFFFFF'
       }
     })
+    console.log('QR Code gerado com sucesso')
   } catch (error) {
     console.error('Erro ao gerar QR Code:', error)
+    error.value = 'Erro ao gerar QR Code'
   }
 }
 
 async function copiarCodigo() {
-  if (!props.mensalidade?.qrCodePix) return
+  if (!qrCodeData.value) return
 
   try {
-    await navigator.clipboard.writeText(props.mensalidade.qrCodePix)
+    await navigator.clipboard.writeText(qrCodeData.value)
     copiado.value = true
     setTimeout(() => {
       copiado.value = false
@@ -144,7 +192,7 @@ async function copiarCodigo() {
 watch(() => props.show, async (show) => {
   if (show && props.mensalidade) {
     await nextTick()
-    gerarQRCode()
+    buscarQRCode()
   }
 })
 </script>

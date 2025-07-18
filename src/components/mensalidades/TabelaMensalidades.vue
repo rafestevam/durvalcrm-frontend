@@ -57,16 +57,15 @@
           
           <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
             <button
-              @click="$emit('verQRCode', mensalidade)"
+              @click="handleVerQRCode(mensalidade)"
               class="text-blue-600 hover:text-blue-900"
-              :disabled="!mensalidade.qrCodePix"
             >
               Ver QR Code
             </button>
             
             <button
               v-if="mensalidade.status !== 'PAGA'"
-              @click="$emit('marcarPaga', mensalidade)"
+              @click="$emit('marcar-paga', mensalidade)"
               class="text-green-600 hover:text-green-900 ml-3"
             >
               Marcar como Paga
@@ -99,12 +98,12 @@ interface Props {
 }
 
 interface Emits {
-  (e: 'verQRCode', mensalidade: Mensalidade): void
-  (e: 'marcarPaga', mensalidade: Mensalidade): void
+  (e: 'ver-qr-code', mensalidade: Mensalidade): void
+  (e: 'marcar-paga', mensalidade: Mensalidade): void
 }
 
 defineProps<Props>()
-defineEmits<Emits>()
+const emit = defineEmits<Emits>()
 
 function getStatusClass(status: StatusMensalidade): string {
   const classes = {
@@ -122,5 +121,21 @@ function getStatusLabel(status: StatusMensalidade): string {
     ATRASADA: 'Atrasada'
   }
   return labels[status] || status
+}
+
+let debounceTimer: number | null = null
+
+function handleVerQRCode(mensalidade: Mensalidade) {
+  // Evitar múltiplos cliques
+  if (debounceTimer) {
+    clearTimeout(debounceTimer)
+  }
+  
+  debounceTimer = setTimeout(() => {
+    console.log('Clicou em Ver QR Code para mensalidade:', mensalidade.id)
+    console.log('Emitindo evento ver-qr-code...')
+    emit('ver-qr-code', mensalidade)
+    debounceTimer = null
+  }, 100)
 }
 </script>

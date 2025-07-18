@@ -200,20 +200,38 @@ async function gerarCobrancas() {
 }
 
 function abrirModalQRCode(mensalidade: Mensalidade) {
+  console.log('=== FUNÇÃO abrirModalQRCode CHAMADA ===')
+  console.log('Mensalidade recebida:', mensalidade.id)
+  console.log('QR Code PIX:', mensalidade.qrCodePix)
+  console.log('Estado atual showQRModal:', showQRModal.value)
+  
   mensalidadeSelecionada.value = mensalidade
   showQRModal.value = true
+  
+  console.log('Estado após mudança showQRModal:', showQRModal.value)
+  console.log('Mensalidade selecionada:', mensalidadeSelecionada.value?.id)
 }
 
 async function marcarComoPaga(mensalidade: Mensalidade) {
   if (confirm(`Confirma que a mensalidade de ${mensalidade.nomeAssociado} foi paga?`)) {
     try {
+      console.log('=== MARCANDO COMO PAGA ===')
+      console.log('Mensalidade ID:', mensalidade.id)
+      
       await mensalidadeService.marcarComoPaga(mensalidade.id)
+      console.log('API call finalizada')
       
       successMessage.value = 'Mensalidade marcada como paga com sucesso!'
       showSuccessAlert.value = true
       
       // Recarregar dados
+      console.log('Recarregando dados do store...')
+      console.log('Resumo antes do reload:', mensalidadesStore.resumo)
+      
       await mensalidadesStore.carregarDados()
+      
+      console.log('Resumo depois do reload:', mensalidadesStore.resumo)
+      console.log('=== FIM MARCAR COMO PAGA ===')
       
     } catch (error) {
       console.error('Erro ao marcar como paga:', error)
