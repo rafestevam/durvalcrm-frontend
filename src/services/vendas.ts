@@ -110,20 +110,6 @@ export const vendaService = {
   },
 
   /**
-   * Listar vendas por associado
-   */
-  async listarPorAssociado(associadoId: string): Promise<Venda[]> {
-    try {
-      validarId(associadoId)
-      const response = await apiService.get<Venda[]>(`/vendas/associado/${associadoId}`)
-      return response
-    } catch (error) {
-      console.error(`Erro ao listar vendas do associado ${associadoId}:`, error)
-      throw error
-    }
-  },
-
-  /**
    * Listar vendas por origem
    */
   async listarPorOrigem(origem: 'CANTINA' | 'BAZAR' | 'LIVROS'): Promise<Venda[]> {

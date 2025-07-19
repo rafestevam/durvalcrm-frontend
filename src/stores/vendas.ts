@@ -189,20 +189,6 @@ export const useVendasStore = defineStore('vendas', () => {
     }
   }
 
-  async function carregarVendasPorAssociado(associadoId: string) {
-    try {
-      loading.value = true
-      error.value = null
-
-      const resultado = await vendaService.listarPorAssociado(associadoId)
-      vendas.value = resultado
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Erro ao carregar vendas por associado'
-      throw err
-    } finally {
-      loading.value = false
-    }
-  }
 
   function alterarPeriodo(dataInicio: string, dataFim: string) {
     periodoSelecionado.value = { dataInicio, dataFim }
@@ -269,7 +255,6 @@ export const useVendasStore = defineStore('vendas', () => {
     carregarVendasRecentes,
     carregarResumo,
     carregarVendasPorOrigem,
-    carregarVendasPorAssociado,
     alterarPeriodo,
     periodoAnterior,
     proximoPeriodo,

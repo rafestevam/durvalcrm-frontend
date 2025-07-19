@@ -38,25 +38,6 @@
               />
             </div>
 
-            <!-- Associado -->
-            <div>
-              <label class="form-label">Associado</label>
-              <select
-                v-model="forma.associadoId"
-                class="form-select"
-                required
-              >
-                <option value="">Selecione um associado</option>
-                <option 
-                  v-for="associado in associadosStore.associados" 
-                  :key="associado.id" 
-                  :value="associado.id"
-                >
-                  {{ associado.nomeCompleto }}
-                </option>
-              </select>
-              <p v-if="errors.associadoId" class="form-error">{{ errors.associadoId }}</p>
-            </div>
 
             <!-- Origem -->
             <div>
@@ -80,16 +61,6 @@
               <p v-if="errors.origem" class="form-error">{{ errors.origem }}</p>
             </div>
 
-            <!-- Observações -->
-            <div>
-              <label class="form-label">Observações (opcional)</label>
-              <textarea
-                v-model="forma.observacoes"
-                class="form-textarea"
-                rows="3"
-                placeholder="Observações sobre a venda..."
-              ></textarea>
-            </div>
 
             <!-- Data (informativa) -->
             <div>
@@ -133,7 +104,7 @@
               <div>
                 <p class="font-medium">{{ venda.descricao }}</p>
                 <p class="text-sm text-gray-600">
-                  {{ getOrigemLabel(venda.origem) }} - {{ venda.nomeAssociado }}
+                  {{ getOrigemLabel(venda.origem) }}
                 </p>
                 <p class="text-xs text-gray-500">{{ formatters.datetime(venda.dataVenda) }}</p>
               </div>
@@ -178,25 +149,20 @@ import AlertMessage from '@/components/common/AlertMessage.vue'
 import { formatters } from '@/utils/formatters'
 import { VENDA_ORIGENS } from '@/utils/constants'
 import { useVendasStore } from '@/stores/vendas'
-import { useAssociadosStore } from '@/stores/associados'
 import type { Venda } from '@/services/types'
 
 const vendasStore = useVendasStore()
-const associadosStore = useAssociadosStore()
 
 const forma = reactive({
   descricao: '',
   valor: '',
   origem: '' as 'CANTINA' | 'BAZAR' | 'LIVROS' | '',
-  associadoId: '',
-  observacoes: '',
 })
 
 const errors = reactive({
   descricao: '',
   valor: '',
   origem: '',
-  associadoId: '',
 })
 
 const isSubmitting = ref(false)
@@ -209,7 +175,6 @@ function validateForm(): boolean {
   errors.descricao = ''
   errors.valor = ''
   errors.origem = ''
-  errors.associadoId = ''
 
   let isValid = true
 
@@ -228,11 +193,6 @@ function validateForm(): boolean {
     isValid = false
   }
 
-  if (!forma.associadoId) {
-    errors.associadoId = 'Selecione um associado'
-    isValid = false
-  }
-
   return isValid
 }
 
@@ -248,16 +208,12 @@ async function registrarVenda() {
       descricao: forma.descricao,
       valor: parseFloat(forma.valor),
       origem: forma.origem as 'CANTINA' | 'BAZAR' | 'LIVROS',
-      associadoId: forma.associadoId,
-      observacoes: forma.observacoes || undefined,
     })
 
     // Reset form
     forma.descricao = ''
     forma.valor = ''
     forma.origem = ''
-    forma.associadoId = ''
-    forma.observacoes = ''
 
     // Mostrar sucesso
     showSuccessAlert.value = true
@@ -278,11 +234,7 @@ function getOrigemLabel(origem: string): string {
 
 onMounted(async () => {
   try {
-    // Carregar associados e vendas recentes em paralelo
-    await Promise.all([
-      associadosStore.fetchAssociados(),
-      vendasStore.carregarVendasRecentes()
-    ])
+    await vendasStore.carregarVendasRecentes()
   } catch (error) {
     console.error('Erro ao carregar dados:', error)
   }

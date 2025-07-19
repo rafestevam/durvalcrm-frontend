@@ -79,9 +79,6 @@ export interface Venda {
   valor: number
   origem: 'CANTINA' | 'BAZAR' | 'LIVROS'
   dataVenda: string
-  observacoes?: string
-  associadoId: string
-  nomeAssociado?: string
   criadoEm: string
   atualizadoEm?: string
 }
