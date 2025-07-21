@@ -324,7 +324,9 @@ async function copiarCodigoPix() {
 
 function confirmarPagamento() {
   emit('confirmar', dadosConfirmacao.value.codigoTransacao, dadosConfirmacao.value.metodoPagamento)
+  // Fechar todas as modais internas
   mostrarModalConfirmacao.value = false
+  mostrarModalPix.value = false
   dadosConfirmacao.value = {
     codigoTransacao: '',
     metodoPagamento: ''

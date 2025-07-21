@@ -65,11 +65,13 @@
       </div>
 
       <!-- Estatísticas -->
-      <div class="mt-6">
+      <div class="mt-6 relative">
         <DoacaoEstatisticas 
           :estatisticas="estatisticas" 
           :loading="loadingEstatisticas" 
         />
+        <!-- Notification Tray -->
+        <NotificationTray />
       </div>
 
     <!-- Lista de doações -->
@@ -143,6 +145,7 @@ import { useDoacoesStore } from '@/stores/doacoes'
 import { useNotification } from '@/composables/useNotification'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
+import NotificationTray from '@/components/common/NotificationTray.vue'
 import DoacaoList from '@/components/doacoes/DoacaoList.vue'
 import DoacaoForm from '@/components/doacoes/DoacaoForm.vue'
 import DoacaoDetalhes from '@/components/doacoes/DoacaoDetalhes.vue'
@@ -175,7 +178,8 @@ onMounted(async () => {
 
 async function carregarDados() {
   await doacoesStore.carregarDoacoes()
-  await carregarEstatisticas()
+  // Carregar estatísticas expandidas para garantir que incluam doações de períodos anteriores
+  await carregarEstatisticasExpandidas()
 }
 
 async function carregarEstatisticas() {
@@ -188,6 +192,26 @@ async function carregarEstatisticas() {
   } catch (error) {
     console.warn('Erro ao carregar estatísticas:', error)
     // Não exibir erro para o usuário - estatísticas são opcionais
+  } finally {
+    loadingEstatisticas.value = false
+  }
+}
+
+async function carregarEstatisticasExpandidas() {
+  loadingEstatisticas.value = true
+  try {
+    // Expandir período para os últimos 30 dias para garantir que doações antigas confirmadas hoje sejam incluídas
+    const fim = new Date()
+    fim.setHours(23, 59, 59, 999)
+    const inicio = new Date()
+    inicio.setDate(inicio.getDate() - 30)
+    inicio.setHours(0, 0, 0, 0)
+    
+    await doacoesStore.carregarEstatisticas(inicio, fim)
+  } catch (error) {
+    console.warn('Erro ao carregar estatísticas expandidas:', error)
+    // Tentar carregar estatísticas normais como fallback
+    await carregarEstatisticas()
   } finally {
     loadingEstatisticas.value = false
   }
@@ -250,8 +274,20 @@ async function confirmarPagamento(codigoTransacao: string, metodoPagamento: stri
       codigoTransacao, 
       metodoPagamento
     )
-    showSuccess('Pagamento confirmado com sucesso!')
-    await carregarEstatisticas()
+    // Fechar todas as modais
+    fecharModalDetalhes()
+    
+    showSuccess('Doacao confirmada com sucesso', '', 8000)
+    
+    // Pequeno delay para garantir que o backend processou a atualização
+    await new Promise(resolve => setTimeout(resolve, 500))
+    
+    // Recarregar dados para atualizar estatísticas
+    await carregarDados()
+    
+    // Expandir período das estatísticas para garantir que a doação confirmada seja incluída
+    // Buscar estatísticas desde o início do mês até hoje
+    await carregarEstatisticasExpandidas()
   } catch (error: any) {
     showError(error.message || 'Erro ao confirmar pagamento')
   }
@@ -264,7 +300,9 @@ async function cancelarDoacao() {
     await doacoesStore.cancelarDoacao(doacaoSelecionada.value.id)
     showSuccess('Doação cancelada com sucesso!')
     fecharModalDetalhes()
-    await carregarEstatisticas()
+    
+    // Expandir período das estatísticas para garantir que a doação cancelada seja incluída
+    await carregarEstatisticasExpandidas()
   } catch (error: any) {
     showError(error.message || 'Erro ao cancelar doação')
   }
@@ -277,7 +315,9 @@ async function excluirDoacao() {
     await doacoesStore.excluirDoacao(doacaoSelecionada.value.id)
     showSuccess('Doação excluída com sucesso!')
     fecharModalDetalhes()
-    await carregarEstatisticas()
+    
+    // Expandir período das estatísticas para garantir que as doações restantes sejam incluídas
+    await carregarEstatisticasExpandidas()
   } catch (error: any) {
     showError(error.message || 'Erro ao excluir doação')
   }
