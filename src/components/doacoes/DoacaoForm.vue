@@ -2,22 +2,21 @@
   <form @submit.prevent="handleSubmit" class="space-y-6">
     <div>
       <label for="associado" class="block text-sm font-medium text-gray-700">
-        Associado
+        Associado <span class="text-sm text-gray-500">(opcional - para doações identificadas)</span>
       </label>
       <select
         id="associado"
         v-model="formData.associadoId"
         :disabled="isEdit"
-        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-        required
+        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
       >
-        <option value="">Selecione um associado</option>
+        <option value="">Doação anônima</option>
         <option
           v-for="associado in associados"
           :key="associado.id"
           :value="associado.id"
         >
-          {{ associado.nome }} - CPF: {{ formatarCPF(associado.cpf) }}
+          {{ associado.nomeCompleto }} - CPF: {{ formatarCPF(associado.cpf) }}
         </option>
       </select>
     </div>
@@ -36,7 +35,7 @@
           type="number"
           step="0.01"
           min="0"
-          class="pl-12 focus:ring-indigo-500 focus:border-indigo-500 block w-full pr-12 sm:text-sm border-gray-300 rounded-md"
+          class="pl-12 focus:ring-blue-500 focus:border-blue-500 block w-full pr-12 sm:text-sm border-gray-300 rounded-md"
           placeholder="0,00"
           required
         />
@@ -50,7 +49,7 @@
       <select
         id="tipo"
         v-model="formData.tipo"
-        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
         required
       >
         <option value="">Selecione o tipo</option>
@@ -67,7 +66,7 @@
         id="dataDoacao"
         v-model="formData.dataDoacao"
         type="datetime-local"
-        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
       />
     </div>
 
@@ -79,7 +78,7 @@
         id="descricao"
         v-model="formData.descricao"
         rows="3"
-        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
         placeholder="Adicione uma descrição para esta doação..."
       />
     </div>
@@ -88,14 +87,14 @@
       <button
         type="button"
         @click="$emit('cancelar')"
-        class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
       >
         Cancelar
       </button>
       <button
         type="submit"
         :disabled="loading"
-        class="inline-flex justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+        class="inline-flex justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <svg v-if="loading" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
@@ -112,6 +111,7 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useAssociadosStore } from '@/stores/associados'
 import type { Doacao, DoacaoFormData, TipoDoacao } from '@/types/doacao'
 import type { Associado } from '@/types/associado'
+import { toLocalISOString } from '@/utils/dateUtils'
 
 interface Props {
   doacao?: Doacao | null
@@ -129,7 +129,7 @@ const associadosStore = useAssociadosStore()
 const associados = computed(() => associadosStore.associados)
 
 const formData = ref<DoacaoFormData>({
-  associadoId: 0,
+  associadoId: '',
   valor: 0,
   tipo: 'UNICA' as TipoDoacao,
   descricao: '',
@@ -159,7 +159,7 @@ onMounted(async () => {
 function handleSubmit() {
   const dadosParaEnviar = {
     ...formData.value,
-    dataDoacao: formData.value.dataDoacao ? new Date(formData.value.dataDoacao).toISOString() : undefined
+    dataDoacao: formData.value.dataDoacao ? toLocalISOString(new Date(formData.value.dataDoacao)) : undefined
   }
   emit('submit', dadosParaEnviar)
 }

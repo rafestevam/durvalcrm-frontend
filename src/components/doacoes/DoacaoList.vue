@@ -48,7 +48,7 @@
         <tbody class="bg-white divide-y divide-gray-200">
           <tr v-for="doacao in doacoes" :key="doacao.id" class="hover:bg-gray-50">
             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-              {{ doacao.nomeAssociado }}
+              {{ doacao.nomeAssociado || 'Anônimo' }}
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
               {{ formatarMoeda(doacao.valor) }}

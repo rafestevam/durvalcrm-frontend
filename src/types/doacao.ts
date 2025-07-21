@@ -10,10 +10,15 @@ export enum TipoDoacao {
   RECORRENTE = 'RECORRENTE'
 }
 
+export enum MetodoPagamento {
+  PIX = 'PIX',
+  DINHEIRO = 'DINHEIRO'
+}
+
 export interface Doacao {
-  id: number
-  associadoId: number
-  nomeAssociado: string
+  id: string
+  associadoId?: string
+  nomeAssociado?: string
   valor: number
   tipo: TipoDoacao
   status: StatusDoacao
@@ -27,7 +32,7 @@ export interface Doacao {
 }
 
 export interface DoacaoFormData {
-  associadoId: number
+  associadoId?: string
   valor: number
   tipo: TipoDoacao
   descricao?: string
@@ -45,5 +50,5 @@ export interface DoacaoEstatisticas {
 
 export interface ConfirmarPagamentoData {
   codigoTransacao: string
-  metodoPagamento: string
+  metodoPagamento: MetodoPagamento
 }

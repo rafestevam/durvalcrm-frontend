@@ -9,7 +9,7 @@ import { useAuthStore } from '@/stores/auth'
 import authService from '@/services/auth'
 import { APP_CONFIG } from '@/utils/constants'
 
-// Configuração base do axios
+// Configuração base do axios para todas as requisições
 const apiClient: AxiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8082/api',
   timeout: APP_CONFIG.API.TIMEOUT_MS,
@@ -21,8 +21,8 @@ const apiClient: AxiosInstance = axios.create({
 // Interceptor de requisição para adicionar o token
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    // Obter token do authService em vez do store
-    const token = authService.getAccessToken()
+    // Obter token diretamente do localStorage
+    const token = localStorage.getItem('access_token')
     
     if (token) {
       config.headers.Authorization = `Bearer ${token}`

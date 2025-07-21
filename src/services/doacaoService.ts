@@ -1,69 +1,66 @@
-import api from '@/services/api'
+import apiService from '@/services/api'
 import type { Doacao, DoacaoFormData, DoacaoEstatisticas } from '@/types/doacao'
+import { toLocalISOString } from '@/utils/dateUtils'
 
 export default {
   async listar(resumo = false): Promise<Doacao[]> {
-    const response = await api.get('/doacoes', { params: { resumo } })
-    return response.data
+    return await apiService.get('/doacoes', { params: { resumo } })
   },
 
-  async buscarPorId(id: number): Promise<Doacao> {
-    const response = await api.get(`/doacoes/${id}`)
-    return response.data
+  async buscarPorId(id: string): Promise<Doacao> {
+    return await apiService.get(`/doacoes/${id}`)
   },
 
-  async listarPorAssociado(associadoId: number): Promise<Doacao[]> {
-    const response = await api.get(`/doacoes/associado/${associadoId}`)
-    return response.data
+  async listarPorAssociado(associadoId: string): Promise<Doacao[]> {
+    return await apiService.get(`/doacoes/associado/${associadoId}`)
   },
 
   async listarPorPeriodo(inicio: Date, fim: Date): Promise<Doacao[]> {
     const params = {
-      inicio: inicio.toISOString(),
-      fim: fim.toISOString()
+      inicio: toLocalISOString(inicio),
+      fim: toLocalISOString(fim)
     }
-    const response = await api.get('/doacoes/periodo', { params })
-    return response.data
+    return await apiService.get('/doacoes/periodo', { params })
   },
 
   async criar(dados: DoacaoFormData): Promise<Doacao> {
-    const response = await api.post('/doacoes', dados)
-    return response.data
+    // Converter data para formato LocalDateTime se presente
+    const dadosFormatados = {
+      ...dados,
+      associadoId: dados.associadoId || undefined, // Enviar undefined em vez de string vazia
+      dataDoacao: dados.dataDoacao ? toLocalISOString(new Date(dados.dataDoacao)) : undefined
+    }
+    return await apiService.post('/doacoes', dadosFormatados)
   },
 
-  async atualizar(id: number, dados: Partial<DoacaoFormData>): Promise<Doacao> {
-    const response = await api.put(`/doacoes/${id}`, dados)
-    return response.data
+  async atualizar(id: string, dados: Partial<DoacaoFormData>): Promise<Doacao> {
+    return await apiService.put(`/doacoes/${id}`, dados)
   },
 
-  async confirmarPagamento(id: number, codigoTransacao: string, metodoPagamento: string): Promise<Doacao> {
-    const response = await api.post(`/doacoes/${id}/confirmar-pagamento`, {
+  async confirmarPagamento(id: string, codigoTransacao: string, metodoPagamento: string): Promise<Doacao> {
+    return await apiService.post(`/doacoes/${id}/confirmar-pagamento`, {
       codigoTransacao,
       metodoPagamento
     })
-    return response.data
   },
 
-  async cancelar(id: number): Promise<Doacao> {
-    const response = await api.post(`/doacoes/${id}/cancelar`)
-    return response.data
+  async cancelar(id: string): Promise<Doacao> {
+    return await apiService.post(`/doacoes/${id}/cancelar`)
   },
 
-  async excluir(id: number): Promise<void> {
-    await api.delete(`/doacoes/${id}`)
+  async excluir(id: string): Promise<void> {
+    await apiService.delete(`/doacoes/${id}`)
   },
 
   async obterEstatisticas(inicio: Date, fim: Date): Promise<DoacaoEstatisticas> {
     const params = {
-      inicio: inicio.toISOString(),
-      fim: fim.toISOString()
+      inicio: toLocalISOString(inicio),
+      fim: toLocalISOString(fim)
     }
-    const response = await api.get('/doacoes/estatisticas', { params })
-    return response.data
+    return await apiService.get('/doacoes/estatisticas', { params })
   },
 
-  async gerarCodigoPix(id: number): Promise<{ codigoPix: string }> {
-    const response = await api.get(`/doacoes/${id}/pix`)
-    return response.data
+  async gerarCodigoPix(id: string): Promise<{ codigoPix: string }> {
+    return await apiService.get(`/doacoes/${id}/pix`)
   }
 }

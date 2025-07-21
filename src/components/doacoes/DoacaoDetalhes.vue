@@ -21,7 +21,7 @@
         <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
           <dt class="text-sm font-medium text-gray-500">Associado</dt>
           <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-            {{ doacao.nomeAssociado }}
+            {{ doacao.nomeAssociado || 'Anônimo' }}
           </dd>
         </div>
         
@@ -218,11 +218,8 @@
                     class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                   >
                     <option value="">Selecione...</option>
-                    <option value="PIX">PIX</option>
-                    <option value="Cartão de Crédito">Cartão de Crédito</option>
-                    <option value="Cartão de Débito">Cartão de Débito</option>
-                    <option value="Boleto">Boleto</option>
-                    <option value="Transferência">Transferência</option>
+                    <option :value="MetodoPagamento.PIX">PIX</option>
+                    <option :value="MetodoPagamento.DINHEIRO">Dinheiro</option>
                   </select>
                 </div>
               </div>
@@ -252,6 +249,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { useDoacoesStore } from '@/stores/doacoes'
+import { MetodoPagamento } from '@/types/doacao'
 import type { Doacao, StatusDoacao } from '@/types/doacao'
 
 interface Props {

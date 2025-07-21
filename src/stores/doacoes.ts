@@ -46,7 +46,7 @@ export const useDoacoesStore = defineStore('doacoes', () => {
     }
   }
 
-  async function carregarDoacoesPorAssociado(associadoId: number) {
+  async function carregarDoacoesPorAssociado(associadoId: string) {
     loading.value = true
     error.value = null
     try {
@@ -59,7 +59,7 @@ export const useDoacoesStore = defineStore('doacoes', () => {
     }
   }
 
-  async function carregarDoacao(id: number) {
+  async function carregarDoacao(id: string) {
     loading.value = true
     error.value = null
     try {
@@ -88,7 +88,7 @@ export const useDoacoesStore = defineStore('doacoes', () => {
     }
   }
 
-  async function atualizarDoacao(id: number, dados: Partial<DoacaoFormData>) {
+  async function atualizarDoacao(id: string, dados: Partial<DoacaoFormData>) {
     loading.value = true
     error.value = null
     try {
@@ -109,7 +109,7 @@ export const useDoacoesStore = defineStore('doacoes', () => {
     }
   }
 
-  async function confirmarPagamento(id: number, codigoTransacao: string, metodoPagamento: string) {
+  async function confirmarPagamento(id: string, codigoTransacao: string, metodoPagamento: string) {
     loading.value = true
     error.value = null
     try {
@@ -130,7 +130,7 @@ export const useDoacoesStore = defineStore('doacoes', () => {
     }
   }
 
-  async function cancelarDoacao(id: number) {
+  async function cancelarDoacao(id: string) {
     loading.value = true
     error.value = null
     try {
@@ -151,7 +151,7 @@ export const useDoacoesStore = defineStore('doacoes', () => {
     }
   }
 
-  async function excluirDoacao(id: number) {
+  async function excluirDoacao(id: string) {
     loading.value = true
     error.value = null
     try {
@@ -182,7 +182,7 @@ export const useDoacoesStore = defineStore('doacoes', () => {
     }
   }
 
-  async function gerarCodigoPix(id: number) {
+  async function gerarCodigoPix(id: string) {
     loading.value = true
     error.value = null
     try {

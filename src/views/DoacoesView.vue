@@ -185,6 +185,9 @@ async function carregarEstatisticas() {
     const fim = new Date(filtros.value.dataFim)
     fim.setHours(23, 59, 59, 999)
     await doacoesStore.carregarEstatisticas(inicio, fim)
+  } catch (error) {
+    console.warn('Erro ao carregar estatísticas:', error)
+    // Não exibir erro para o usuário - estatísticas são opcionais
   } finally {
     loadingEstatisticas.value = false
   }

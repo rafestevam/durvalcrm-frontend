@@ -31,19 +31,19 @@ export interface TokenResponse {
 
 export class AuthService {
   async getLoginInfo(): Promise<LoginInfo> {
-    return apiService.get<LoginInfo>('/auth/login-info')
+    return await apiService.get<LoginInfo>('/auth/login-info')
   }
 
   async getUserInfo(): Promise<UserInfo> {
-    return apiService.get<UserInfo>('/auth/user-info')
+    return await apiService.get<UserInfo>('/auth/user-info')
   }
 
   async validateToken(): Promise<{ valid: boolean; username?: string }> {
-    return apiService.get('/auth/validate')
+    return await apiService.get('/auth/validate')
   }
 
   async logout(): Promise<{ message: string; logoutUrl: string }> {
-    return apiService.get('/auth/logout')
+    return await apiService.get('/auth/logout')
   }
 
   // NOVO MÉTODO: refreshToken
