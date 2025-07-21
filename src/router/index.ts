@@ -41,6 +41,12 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: ROUTES.DOACOES,
+      name: 'Doacoes',
+      component: () => import('@/views/DoacoesView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
       path: '/:pathMatch(.*)*',
       name: 'NotFound',
       redirect: ROUTES.DASHBOARD,

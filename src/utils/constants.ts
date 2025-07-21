@@ -17,6 +17,8 @@ export const ROUTES = {
   
   VENDAS: '/vendas',
   
+  DOACOES: '/doacoes',
+  
   RECONCILIACAO: '/reconciliacao',
   
   // Rotas de configuração
@@ -67,6 +69,21 @@ export const API_ENDPOINTS = {
     GET: (id: string) => `/vendas/${id}`,
     UPDATE: (id: string) => `/vendas/${id}`,
     DELETE: (id: string) => `/vendas/${id}`,
+  },
+  
+  // Doações
+  DOACOES: {
+    LIST: '/doacoes',
+    CREATE: '/doacoes',
+    GET: (id: string) => `/doacoes/${id}`,
+    UPDATE: (id: string) => `/doacoes/${id}`,
+    DELETE: (id: string) => `/doacoes/${id}`,
+    POR_ASSOCIADO: (associadoId: string) => `/doacoes/associado/${associadoId}`,
+    POR_PERIODO: '/doacoes/periodo',
+    CONFIRMAR_PAGAMENTO: (id: string) => `/doacoes/${id}/confirmar-pagamento`,
+    CANCELAR: (id: string) => `/doacoes/${id}/cancelar`,
+    ESTATISTICAS: '/doacoes/estatisticas',
+    PIX: (id: string) => `/doacoes/${id}/pix`,
   },
 } as const
 

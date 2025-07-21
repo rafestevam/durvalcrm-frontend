@@ -52,6 +52,7 @@ import {
   UsersIcon,
   CreditCardIcon,
   ShoppingCartIcon,
+  GiftIcon,
 } from '@heroicons/vue/24/outline'
 import { APP_CONFIG, ROUTES } from '@/utils/constants'
 
@@ -70,6 +71,11 @@ const navigation = [
     name: 'Vendas',
     href: ROUTES.VENDAS,
     icon: ShoppingCartIcon,
+  },
+  {
+    name: 'Doações',
+    href: ROUTES.DOACOES,
+    icon: GiftIcon,
   },
 ]
 </script>
