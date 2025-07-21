@@ -1,26 +1,32 @@
 <template>
-  <div class="doacoes-view">
-    <div class="px-4 sm:px-6 lg:px-8">
-      <div class="sm:flex sm:items-center">
-        <div class="sm:flex-auto">
-          <h1 class="text-2xl font-semibold text-gray-900">Doações</h1>
-          <p class="mt-2 text-sm text-gray-700">
-            Gerencie as doações dos associados
-          </p>
+  <AppLayout>
+    <template #header>
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+          </svg>
+          <div>
+            <h1 class="text-2xl font-bold text-gray-900">Doações</h1>
+            <p class="text-sm text-gray-600">
+              Gerencie as doações dos associados
+            </p>
+          </div>
         </div>
-        <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-          <button
+        
+        <div class="flex items-center space-x-4">
+          <BaseButton
+            variant="primary"
             @click="abrirModalNovaDoacao"
-            type="button"
-            class="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:w-auto"
           >
             <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
             </svg>
             Nova Doação
-          </button>
+          </BaseButton>
         </div>
       </div>
+    </template>
 
       <!-- Filtros de período -->
       <div class="mt-6 bg-white shadow rounded-lg p-4">
@@ -33,7 +39,7 @@
               id="dataInicio"
               v-model="filtros.dataInicio"
               type="date"
-              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
             />
           </div>
           <div>
@@ -44,17 +50,16 @@
               id="dataFim"
               v-model="filtros.dataFim"
               type="date"
-              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
             />
           </div>
           <div class="flex items-end">
-            <button
+            <BaseButton
+              variant="primary"
               @click="aplicarFiltros"
-              type="button"
-              class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
               Filtrar
-            </button>
+            </BaseButton>
           </div>
         </div>
       </div>
@@ -67,16 +72,15 @@
         />
       </div>
 
-      <!-- Lista de doações -->
-      <div class="mt-8">
-        <DoacaoList
-          :doacoes="doacoes"
-          :loading="loading"
-          :error="error"
-          @visualizar="visualizarDoacao"
-          @editar="editarDoacao"
-        />
-      </div>
+    <!-- Lista de doações -->
+    <div class="mt-8">
+      <DoacaoList
+        :doacoes="doacoes"
+        :loading="loading"
+        :error="error"
+        @visualizar="visualizarDoacao"
+        @editar="editarDoacao"
+      />
     </div>
 
     <!-- Modal Nova/Editar Doação -->
@@ -112,7 +116,7 @@
             <button
               @click="fecharModalDetalhes"
               type="button"
-              class="bg-white rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              class="bg-white rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
               <span class="sr-only">Fechar</span>
               <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -130,13 +134,15 @@
         </div>
       </div>
     </div>
-  </div>
+  </AppLayout>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useDoacoesStore } from '@/stores/doacoes'
 import { useNotification } from '@/composables/useNotification'
+import AppLayout from '@/components/layout/AppLayout.vue'
+import BaseButton from '@/components/common/BaseButton.vue'
 import DoacaoList from '@/components/doacoes/DoacaoList.vue'
 import DoacaoForm from '@/components/doacoes/DoacaoForm.vue'
 import DoacaoDetalhes from '@/components/doacoes/DoacaoDetalhes.vue'
