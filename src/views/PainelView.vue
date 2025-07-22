@@ -1,77 +1,103 @@
 <template>
   <AppLayout>
-    <div class="space-y-6">
-      <!-- Cabeçalho -->
-      <div class="flex justify-between items-center">
-        <h1 class="text-2xl font-bold text-gray-900">Dashboard Financeiro</h1>
-        
-        <!-- Seletor de Período -->
-        <div class="flex items-center space-x-4">
-          <span class="text-sm text-gray-600">Exibindo dados de:</span>
-          <div class="relative">
-            <select
-              v-model="periodoSelecionado"
-              @change="carregarDados"
-              class="appearance-none bg-white border border-gray-300 rounded px-4 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-            >
-              <option v-for="periodo in periodosDisponiveis" :key="periodo.value" :value="periodo.value">
-                {{ periodo.label }}
-              </option>
-            </select>
-            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-              <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-              </svg>
-            </div>
+    <template #header>
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <ChartBarIcon class="h-8 w-8 text-blue-600" />
+          <div>
+            <h1 class="text-2xl font-bold text-gray-900">Dashboard Financeiro</h1>
+            <p class="text-sm text-gray-600">
+              Acompanhe as finanças da associação
+            </p>
           </div>
         </div>
+        
+        <div class="flex items-center space-x-4">
+          <span class="text-sm text-gray-600">Período:</span>
+          <select
+            v-model="periodoSelecionado"
+            @change="carregarDados"
+            class="form-select rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+          >
+            <option v-for="periodo in periodosDisponiveis" :key="periodo.value" :value="periodo.value">
+              {{ periodo.label }}
+            </option>
+          </select>
+        </div>
       </div>
+    </template>
+
+    <div class="space-y-6">
 
       <!-- Cards de Resumo -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <!-- Receita Consolidada -->
-        <div class="bg-white rounded-lg shadow p-6">
-          <h3 class="text-gray-600 text-sm font-medium">Receita Consolidada</h3>
-          <p class="text-3xl font-bold text-gray-800 mt-2">
-            {{ formatters.currency(dashboardData.receitaConsolidada) }}
-          </p>
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div class="flex items-center">
+            <div class="p-3 rounded-full bg-green-100">
+              <CurrencyDollarIcon class="h-6 w-6 text-green-600" />
+            </div>
+            <div class="ml-4">
+              <p class="text-sm font-medium text-gray-600">Receita Consolidada</p>
+              <p class="text-2xl font-bold text-gray-900">
+                {{ formatters.currency(dashboardData.receitaConsolidada) }}
+              </p>
+            </div>
+          </div>
         </div>
 
         <!-- Receita de Mensalidades -->
-        <div class="bg-white rounded-lg shadow p-6">
-          <h3 class="text-gray-600 text-sm font-medium">Receita de Mensalidades</h3>
-          <p class="text-3xl font-bold text-gray-800 mt-2">
-            {{ formatters.currency(dashboardData.receitaMensalidades) }}
-          </p>
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div class="flex items-center">
+            <div class="p-3 rounded-full bg-blue-100">
+              <CreditCardIcon class="h-6 w-6 text-blue-600" />
+            </div>
+            <div class="ml-4">
+              <p class="text-sm font-medium text-gray-600">Receita de Mensalidades</p>
+              <p class="text-2xl font-bold text-gray-900">
+                {{ formatters.currency(dashboardData.receitaMensalidades) }}
+              </p>
+            </div>
+          </div>
         </div>
 
         <!-- Pagantes do Mês -->
-        <div class="bg-white rounded-lg shadow p-6">
-          <h3 class="text-gray-600 text-sm font-medium">Pagantes do Mês</h3>
-          <p class="text-3xl font-bold text-gray-800 mt-2">
-            {{ dashboardData.pagantesMes }} / {{ dashboardData.totalAssociados }}
-          </p>
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div class="flex items-center">
+            <div class="p-3 rounded-full bg-purple-100">
+              <UsersIcon class="h-6 w-6 text-purple-600" />
+            </div>
+            <div class="ml-4">
+              <p class="text-sm font-medium text-gray-600">Pagantes do Mês</p>
+              <p class="text-2xl font-bold text-gray-900">
+                {{ dashboardData.pagantesMes }} / {{ dashboardData.totalAssociados }}
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 
       <!-- Seção inferior com gráfico e listas -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Gráfico de Receita por Categoria -->
-        <div class="bg-white rounded-lg shadow p-6">
-          <h2 class="text-xl font-bold text-gray-900 mb-6">Receita por Categoria</h2>
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="text-lg font-semibold text-gray-900">Receita por Categoria</h2>
+            <ChartBarIcon class="h-5 w-5 text-gray-400" />
+          </div>
           
           <div class="space-y-4">
             <!-- Mensalidades -->
             <div>
               <div class="flex justify-between items-center mb-2">
-                <span class="text-sm text-gray-600">Mensalidades</span>
-                <span class="text-sm font-medium text-gray-800">
+                <span class="text-sm font-medium text-gray-700">Mensalidades</span>
+                <span class="text-sm font-semibold text-gray-900">
                   {{ formatters.currency(dashboardData.receitaMensalidades) }}
                 </span>
               </div>
-              <div class="w-full bg-gray-200 rounded-full h-5">
+              <div class="relative w-full bg-gray-100 rounded-full h-2">
                 <div
-                  class="bg-blue-500 h-5 rounded-full"
+                  class="absolute top-0 left-0 h-2 bg-blue-500 rounded-full transition-all duration-300"
                   :style="`width: ${calcularPorcentagem(dashboardData.receitaMensalidades)}%`"
                 ></div>
               </div>
@@ -80,14 +106,14 @@
             <!-- Cantina -->
             <div>
               <div class="flex justify-between items-center mb-2">
-                <span class="text-sm text-gray-600">Cantina</span>
-                <span class="text-sm font-medium text-gray-800">
+                <span class="text-sm font-medium text-gray-700">Cantina</span>
+                <span class="text-sm font-semibold text-gray-900">
                   {{ formatters.currency(dashboardData.receitaCantina) }}
                 </span>
               </div>
-              <div class="w-full bg-gray-200 rounded-full h-5">
+              <div class="relative w-full bg-gray-100 rounded-full h-2">
                 <div
-                  class="bg-green-500 h-5 rounded-full"
+                  class="absolute top-0 left-0 h-2 bg-green-500 rounded-full transition-all duration-300"
                   :style="`width: ${calcularPorcentagem(dashboardData.receitaCantina)}%`"
                 ></div>
               </div>
@@ -96,14 +122,14 @@
             <!-- Bazar -->
             <div>
               <div class="flex justify-between items-center mb-2">
-                <span class="text-sm text-gray-600">Bazar</span>
-                <span class="text-sm font-medium text-gray-800">
+                <span class="text-sm font-medium text-gray-700">Bazar</span>
+                <span class="text-sm font-semibold text-gray-900">
                   {{ formatters.currency(dashboardData.receitaBazar) }}
                 </span>
               </div>
-              <div class="w-full bg-gray-200 rounded-full h-5">
+              <div class="relative w-full bg-gray-100 rounded-full h-2">
                 <div
-                  class="bg-orange-500 h-5 rounded-full"
+                  class="absolute top-0 left-0 h-2 bg-orange-500 rounded-full transition-all duration-300"
                   :style="`width: ${calcularPorcentagem(dashboardData.receitaBazar)}%`"
                 ></div>
               </div>
@@ -112,14 +138,14 @@
             <!-- Livros -->
             <div>
               <div class="flex justify-between items-center mb-2">
-                <span class="text-sm text-gray-600">Livros</span>
-                <span class="text-sm font-medium text-gray-800">
+                <span class="text-sm font-medium text-gray-700">Livros</span>
+                <span class="text-sm font-semibold text-gray-900">
                   {{ formatters.currency(dashboardData.receitaLivros) }}
                 </span>
               </div>
-              <div class="w-full bg-gray-200 rounded-full h-5">
+              <div class="relative w-full bg-gray-100 rounded-full h-2">
                 <div
-                  class="bg-purple-600 h-5 rounded-full"
+                  class="absolute top-0 left-0 h-2 bg-purple-600 rounded-full transition-all duration-300"
                   :style="`width: ${calcularPorcentagem(dashboardData.receitaLivros)}%`"
                 ></div>
               </div>
@@ -128,40 +154,65 @@
         </div>
 
         <!-- Lista de Adimplentes/Inadimplentes -->
-        <div class="bg-white rounded-lg shadow p-6">
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
           <!-- Adimplentes -->
-          <div class="mb-6">
-            <h3 class="text-lg font-bold text-green-600 mb-4">
-              ✅ Adimplentes ({{ dashboardData.adimplentes.length }})
-            </h3>
-            <div class="space-y-3 max-h-40 overflow-y-auto">
-              <div v-for="associado in dashboardData.adimplentes.slice(0, 3)" :key="associado.id">
-                <p class="font-medium text-gray-700">{{ associado.nomeCompleto }}</p>
-                <p class="text-sm text-gray-500">{{ associado.email }}</p>
+          <div class="p-6 border-b border-gray-200">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-lg font-semibold text-gray-900">
+                Adimplentes
+              </h3>
+              <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                {{ dashboardData.adimplentes.length }} associados
+              </span>
+            </div>
+            <div class="space-y-3 max-h-48 overflow-y-auto">
+              <div v-for="associado in dashboardData.adimplentes.slice(0, 3)" :key="associado.id" class="flex items-center space-x-3">
+                <div class="flex-shrink-0">
+                  <div class="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
+                    <CheckIcon class="h-5 w-5 text-green-600" />
+                  </div>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-medium text-gray-900 truncate">{{ associado.nomeCompleto }}</p>
+                  <p class="text-sm text-gray-500 truncate">{{ associado.email }}</p>
+                </div>
               </div>
-              <p v-if="dashboardData.adimplentes.length > 3" class="text-gray-400">(...)</p>
+              <p v-if="dashboardData.adimplentes.length > 3" class="text-sm text-gray-500 text-center mt-2">e mais {{ dashboardData.adimplentes.length - 3 }} associados...</p>
             </div>
           </div>
 
-          <div class="border-t pt-6">
-            <!-- Inadimplentes -->
-            <h3 class="text-lg font-bold text-red-600 mb-4">
-              ❌ Inadimplentes ({{ dashboardData.inadimplentes.length }})
-            </h3>
-            <div class="space-y-3">
-              <div v-for="associado in dashboardData.inadimplentes.slice(0, 3)" :key="associado.id" class="flex justify-between items-center">
-                <div>
-                  <p class="font-medium text-gray-700">{{ associado.nomeCompleto }}</p>
-                  <p class="text-sm text-gray-500">{{ associado.email }}</p>
+          <!-- Inadimplentes -->
+          <div class="p-6">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-lg font-semibold text-gray-900">
+                Inadimplentes
+              </h3>
+              <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
+                {{ dashboardData.inadimplentes.length }} associados
+              </span>
+            </div>
+            <div class="space-y-3 max-h-48 overflow-y-auto">
+              <div v-for="associado in dashboardData.inadimplentes.slice(0, 3)" :key="associado.id" class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                  <div class="flex-shrink-0">
+                    <div class="h-10 w-10 rounded-full bg-red-100 flex items-center justify-center">
+                      <XMarkIcon class="h-5 w-5 text-red-600" />
+                    </div>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-gray-900 truncate">{{ associado.nomeCompleto }}</p>
+                    <p class="text-sm text-gray-500 truncate">{{ associado.email }}</p>
+                  </div>
                 </div>
-                <button
+                <BaseButton
+                  variant="secondary"
+                  size="sm"
                   @click="gerarCobranca(associado.id)"
-                  class="px-4 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded hover:bg-gray-200"
                 >
                   Gerar Cobrança
-                </button>
+                </BaseButton>
               </div>
-              <p v-if="dashboardData.inadimplentes.length > 3" class="text-gray-400">(...)</p>
+              <p v-if="dashboardData.inadimplentes.length > 3" class="text-sm text-gray-500 text-center mt-2">e mais {{ dashboardData.inadimplentes.length - 3 }} associados...</p>
             </div>
           </div>
         </div>
@@ -172,7 +223,16 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { 
+  ChartBarIcon, 
+  CurrencyDollarIcon, 
+  CreditCardIcon, 
+  UsersIcon,
+  CheckIcon,
+  XMarkIcon 
+} from '@heroicons/vue/24/outline'
 import AppLayout from '@/components/layout/AppLayout.vue'
+import BaseButton from '@/components/common/BaseButton.vue'
 import { formatters } from '@/utils/formatters'
 import { painelService } from '@/services/painel'
 import type { DashboardData } from '@/services/types'
