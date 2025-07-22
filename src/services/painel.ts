@@ -7,11 +7,12 @@ export const painelService = {
       // Por enquanto, retornamos dados mockados
       // TODO: Implementar endpoint no backend
       const mockData: DashboardData = {
-        receitaConsolidada: 1250.50,
+        receitaConsolidada: 1450.50,
         receitaMensalidades: 850.00,
         receitaCantina: 250.30,
         receitaBazar: 100.00,
         receitaLivros: 50.20,
+        receitaDoacoes: 200.00,
         pagantesMes: 85,
         totalAssociados: 100,
         adimplentes: [

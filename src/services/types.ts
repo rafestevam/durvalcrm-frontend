@@ -172,6 +172,7 @@ export interface DashboardData {
   receitaCantina: number
   receitaBazar: number
   receitaLivros: number
+  receitaDoacoes: number
   pagantesMes: number
   totalAssociados: number
   adimplentes: Associado[]

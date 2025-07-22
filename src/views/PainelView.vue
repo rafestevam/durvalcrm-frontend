@@ -87,6 +87,30 @@
           </div>
           
           <div class="space-y-4">
+            <!-- Legenda com percentuais -->
+            <div class="grid grid-cols-2 gap-2 mb-4 text-xs">
+              <div class="flex items-center">
+                <div class="w-3 h-3 bg-blue-500 rounded mr-2"></div>
+                <span>Mensalidades ({{ calcularPorcentagem(dashboardData.receitaMensalidades) }}%)</span>
+              </div>
+              <div class="flex items-center">
+                <div class="w-3 h-3 bg-green-500 rounded mr-2"></div>
+                <span>Cantina ({{ calcularPorcentagem(dashboardData.receitaCantina) }}%)</span>
+              </div>
+              <div class="flex items-center">
+                <div class="w-3 h-3 bg-orange-500 rounded mr-2"></div>
+                <span>Bazar ({{ calcularPorcentagem(dashboardData.receitaBazar) }}%)</span>
+              </div>
+              <div class="flex items-center">
+                <div class="w-3 h-3 bg-purple-600 rounded mr-2"></div>
+                <span>Livros ({{ calcularPorcentagem(dashboardData.receitaLivros) }}%)</span>
+              </div>
+              <div class="flex items-center">
+                <div class="w-3 h-3 bg-pink-500 rounded mr-2"></div>
+                <span>Doações ({{ calcularPorcentagem(dashboardData.receitaDoacoes) }}%)</span>
+              </div>
+            </div>
+
             <!-- Mensalidades -->
             <div>
               <div class="flex justify-between items-center mb-2">
@@ -147,6 +171,22 @@
                 <div
                   class="absolute top-0 left-0 h-2 bg-purple-600 rounded-full transition-all duration-300"
                   :style="`width: ${calcularPorcentagem(dashboardData.receitaLivros)}%`"
+                ></div>
+              </div>
+            </div>
+
+            <!-- Doações -->
+            <div>
+              <div class="flex justify-between items-center mb-2">
+                <span class="text-sm font-medium text-gray-700">Doações</span>
+                <span class="text-sm font-semibold text-gray-900">
+                  {{ formatters.currency(dashboardData.receitaDoacoes) }}
+                </span>
+              </div>
+              <div class="relative w-full bg-gray-100 rounded-full h-2">
+                <div
+                  class="absolute top-0 left-0 h-2 bg-pink-500 rounded-full transition-all duration-300"
+                  :style="`width: ${calcularPorcentagem(dashboardData.receitaDoacoes)}%`"
                 ></div>
               </div>
             </div>
@@ -244,6 +284,7 @@ const dashboardData = ref<DashboardData>({
   receitaCantina: 0,
   receitaBazar: 0,
   receitaLivros: 0,
+  receitaDoacoes: 0,
   pagantesMes: 0,
   totalAssociados: 0,
   adimplentes: [],
