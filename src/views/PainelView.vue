@@ -275,7 +275,9 @@ import AppLayout from '@/components/layout/AppLayout.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 import { formatters } from '@/utils/formatters'
 import { painelService } from '@/services/painel'
+import { mensalidadeService } from '@/services/mensalidade'
 import type { DashboardData } from '@/services/types'
+import { useNotification } from '@/composables/useNotification'
 
 // Estado
 const dashboardData = ref<DashboardData>({
@@ -336,11 +338,29 @@ async function carregarDados() {
 async function gerarCobranca(associadoId: string | undefined) {
   if (!associadoId) return
   
+  const { showSuccess, showError } = useNotification()
+  
   try {
-    // Implementar lógica de geração de cobrança
-    console.log('Gerar cobrança para:', associadoId)
+    loading.value = true
+    const hoje = new Date()
+    const mes = hoje.getMonth() + 1
+    const ano = hoje.getFullYear()
+    
+    // Gerar cobrança para o associado
+    const resultado = await mensalidadeService.gerarCobrancasIndividual(associadoId, mes, ano)
+    
+    if (resultado.cobrancasGeradas > 0) {
+      showSuccess(`Cobrança gerada com sucesso!`)
+      // Recarregar dados do dashboard
+      await carregarDados()
+    } else {
+      showError('Cobrança já existe para este período')
+    }
   } catch (error) {
     console.error('Erro ao gerar cobrança:', error)
+    showError('Erro ao gerar cobrança')
+  } finally {
+    loading.value = false
   }
 }
 

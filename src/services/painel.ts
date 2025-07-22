@@ -3,9 +3,15 @@ import type { DashboardData } from './types'
 
 export const painelService = {
   async obterDashboard(mes: number, ano: number): Promise<DashboardData> {
+    const response = await api.get('/dashboard', {
+      params: { mes, ano }
+    })
+    return response.data
+  },
+
+  async obterDashboardMock(mes: number, ano: number): Promise<DashboardData> {
     try {
-      // Por enquanto, retornamos dados mockados
-      // TODO: Implementar endpoint no backend
+      // Dados mockados para desenvolvimento
       const mockData: DashboardData = {
         receitaConsolidada: 1450.50,
         receitaMensalidades: 850.00,
@@ -34,12 +40,5 @@ export const painelService = {
       console.error('Erro ao buscar dados do dashboard:', error)
       throw error
     }
-  },
-
-  async obterDashboardReal(mes: number, ano: number): Promise<DashboardData> {
-    const response = await api.get(`/dashboard`, {
-      params: { mes, ano }
-    })
-    return response.data
   }
 }

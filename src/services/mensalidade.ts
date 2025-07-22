@@ -95,6 +95,31 @@ export const mensalidadeService = {
   },
 
   /**
+   * Gera cobrança individual para um associado
+   */
+  async gerarCobrancasIndividual(associadoId: string, mes: number, ano: number): Promise<ResultadoGeracao> {
+    try {
+      validarId(associadoId)
+      validarPeriodo(mes, ano)
+      
+      console.log(`Gerando cobrança individual para associado ${associadoId} - ${mes}/${ano}`)
+      
+      const response = await apiService.post<ResultadoGeracao>(
+        API_ENDPOINTS.MENSALIDADES.GERAR_COBRANCAS, 
+        null, 
+        {
+          params: { mes, ano, associadoId }
+        }
+      )
+      
+      return response
+    } catch (error) {
+      console.error('Erro ao gerar cobrança individual:', error)
+      throw error
+    }
+  },
+
+  /**
    * Obtém uma mensalidade específica
    */
   async obterPorId(id: string): Promise<Mensalidade> {
