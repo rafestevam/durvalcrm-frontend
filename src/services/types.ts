@@ -78,6 +78,7 @@ export interface Venda {
   descricao: string
   valor: number
   origem: 'CANTINA' | 'BAZAR' | 'LIVROS'
+  formaPagamento: 'PIX' | 'DINHEIRO'
   dataVenda: string
   criadoEm: string
   atualizadoEm?: string

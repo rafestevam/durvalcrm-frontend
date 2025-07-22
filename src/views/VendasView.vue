@@ -62,6 +62,38 @@
             </div>
 
 
+            <!-- Opções de Pagamento -->
+            <div>
+              <label class="form-label">Opções de Pagamento</label>
+              <div class="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  class="flex items-center justify-center px-6 py-4 border-2 rounded-lg text-lg font-medium transition-colors"
+                  :class="[
+                    forma.formaPagamento === 'PIX'
+                      ? 'border-primary-500 bg-primary-50 text-primary-700'
+                      : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
+                  ]"
+                  @click="forma.formaPagamento = 'PIX'"
+                >
+                  PIX
+                </button>
+                <button
+                  type="button"
+                  class="flex items-center justify-center px-6 py-4 border-2 rounded-lg text-lg font-medium transition-colors"
+                  :class="[
+                    forma.formaPagamento === 'DINHEIRO'
+                      ? 'border-primary-500 bg-primary-50 text-primary-700'
+                      : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
+                  ]"
+                  @click="forma.formaPagamento = 'DINHEIRO'"
+                >
+                  Dinheiro
+                </button>
+              </div>
+              <p v-if="errors.formaPagamento" class="form-error">{{ errors.formaPagamento }}</p>
+            </div>
+
             <!-- Data (informativa) -->
             <div>
               <p class="text-sm text-gray-600">
@@ -157,12 +189,14 @@ const forma = reactive({
   descricao: '',
   valor: '',
   origem: '' as 'CANTINA' | 'BAZAR' | 'LIVROS' | '',
+  formaPagamento: '' as 'PIX' | 'DINHEIRO' | '',
 })
 
 const errors = reactive({
   descricao: '',
   valor: '',
   origem: '',
+  formaPagamento: '',
 })
 
 const isSubmitting = ref(false)
@@ -175,6 +209,7 @@ function validateForm(): boolean {
   errors.descricao = ''
   errors.valor = ''
   errors.origem = ''
+  errors.formaPagamento = ''
 
   let isValid = true
 
@@ -193,6 +228,11 @@ function validateForm(): boolean {
     isValid = false
   }
 
+  if (!forma.formaPagamento) {
+    errors.formaPagamento = 'Selecione a forma de pagamento'
+    isValid = false
+  }
+
   return isValid
 }
 
@@ -208,12 +248,14 @@ async function registrarVenda() {
       descricao: forma.descricao,
       valor: parseFloat(forma.valor),
       origem: forma.origem as 'CANTINA' | 'BAZAR' | 'LIVROS',
+      formaPagamento: forma.formaPagamento as 'PIX' | 'DINHEIRO',
     })
 
     // Reset form
     forma.descricao = ''
     forma.valor = ''
     forma.origem = ''
+    forma.formaPagamento = ''
 
     // Mostrar sucesso
     showSuccessAlert.value = true
