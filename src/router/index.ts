@@ -47,6 +47,12 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: ROUTES.PAINEL,
+      name: 'Painel',
+      component: () => import('@/views/PainelView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
       path: '/:pathMatch(.*)*',
       name: 'NotFound',
       redirect: ROUTES.DASHBOARD,

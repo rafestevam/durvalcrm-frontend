@@ -19,6 +19,8 @@ export const ROUTES = {
   
   DOACOES: '/doacoes',
   
+  PAINEL: '/painel',
+  
   RECONCILIACAO: '/reconciliacao',
   
   // Rotas de configuração

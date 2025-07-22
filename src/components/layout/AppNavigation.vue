@@ -53,10 +53,16 @@ import {
   CreditCardIcon,
   ShoppingCartIcon,
   GiftIcon,
+  ChartBarIcon,
 } from '@heroicons/vue/24/outline'
 import { APP_CONFIG, ROUTES } from '@/utils/constants'
 
 const navigation = [
+  {
+    name: 'Painel',
+    href: ROUTES.PAINEL,
+    icon: ChartBarIcon,
+  },
   {
     name: 'Associados',
     href: ROUTES.ASSOCIADOS,

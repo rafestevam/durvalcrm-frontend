@@ -164,3 +164,16 @@ export interface KeycloakConfig {
   realm: string
   clientId: string
 }
+
+// Tipos para o Dashboard
+export interface DashboardData {
+  receitaConsolidada: number
+  receitaMensalidades: number
+  receitaCantina: number
+  receitaBazar: number
+  receitaLivros: number
+  pagantesMes: number
+  totalAssociados: number
+  adimplentes: Associado[]
+  inadimplentes: Associado[]
+}
