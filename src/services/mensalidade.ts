@@ -191,13 +191,15 @@ export const mensalidadeService = {
   async marcarComoPaga(id: string, dadosPagamento?: {
     dataPagamento?: string
     observacao?: string
+    metodoPagamento?: 'PIX' | 'DINHEIRO'
   }): Promise<void> {
     try {
       validarId(id)
       
       const dados = {
         dataPagamento: dadosPagamento?.dataPagamento || new Date().toISOString(),
-        observacao: dadosPagamento?.observacao
+        observacao: dadosPagamento?.observacao,
+        metodoPagamento: dadosPagamento?.metodoPagamento || 'PIX' // PIX como padrão
       }
       
       await apiService.patch<void>(

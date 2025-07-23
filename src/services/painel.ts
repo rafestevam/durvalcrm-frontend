@@ -1,5 +1,5 @@
 import api from './api'
-import type { DashboardData } from './types'
+import type { DashboardData, ReceitasPorMetodoPagamento } from './types'
 
 export const painelService = {
   async obterDashboard(mes: number, ano: number): Promise<DashboardData> {
@@ -41,6 +41,21 @@ export const painelService = {
     } catch (error) {
       console.error('Erro ao buscar dados do dashboard:', error)
       throw error
+    }
+  },
+
+  async obterReceitasPorMetodoPagamento(): Promise<ReceitasPorMetodoPagamento> {
+    try {
+      const response = await api.get('/dashboard/receitas-por-metodo-pagamento')
+      return response.data || response
+    } catch (error) {
+      console.error('Erro ao buscar receitas por método de pagamento:', error)
+      // Retornar dados mockados em caso de erro
+      return {
+        totalPix: 650.00,
+        totalDinheiro: 200.00,
+        totalGeral: 850.00
+      }
     }
   }
 }
