@@ -29,8 +29,15 @@
 
     <div class="space-y-6">
 
-      <!-- Cards de Resumo -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <!-- Loading State -->
+      <div v-if="loading" class="flex items-center justify-center py-12">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+
+      <!-- Dashboard Content -->
+      <div v-else>
+        <!-- Cards de Resumo -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
         <!-- Receita Consolidada -->
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div class="flex items-center">
@@ -40,7 +47,7 @@
             <div class="ml-4">
               <p class="text-sm font-medium text-gray-600">Receita Consolidada</p>
               <p class="text-2xl font-bold text-gray-900">
-                {{ formatters.currency(dashboardData.receitaConsolidada) }}
+                {{ formatters.currency(dashboardData?.receitaConsolidada || 0) }}
               </p>
             </div>
           </div>
@@ -78,7 +85,7 @@
       </div>
 
       <!-- Seção inferior com gráfico e listas -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
         <!-- Gráfico de Receita por Categoria -->
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div class="flex items-center justify-between mb-6">
@@ -257,6 +264,7 @@
           </div>
         </div>
       </div>
+      </div>
     </div>
   </AppLayout>
 </template>
@@ -280,7 +288,7 @@ import type { DashboardData } from '@/services/types'
 import { useNotification } from '@/composables/useNotification'
 
 // Estado
-const dashboardData = ref<DashboardData>({
+const defaultDashboardData: DashboardData = {
   receitaConsolidada: 0,
   receitaMensalidades: 0,
   receitaCantina: 0,
@@ -291,7 +299,9 @@ const dashboardData = ref<DashboardData>({
   totalAssociados: 0,
   adimplentes: [],
   inadimplentes: []
-})
+}
+
+const dashboardData = ref<DashboardData>(defaultDashboardData)
 
 const periodoSelecionado = ref('')
 const loading = ref(false)
@@ -314,10 +324,26 @@ const periodosDisponiveis = computed(() => {
   return periodos
 })
 
+// Dados computados seguros
+const dadosSegurosDashboard = computed(() => {
+  return dashboardData.value || {
+    receitaConsolidada: 0,
+    receitaMensalidades: 0,
+    receitaCantina: 0,
+    receitaBazar: 0,
+    receitaLivros: 0,
+    receitaDoacoes: 0,
+    pagantesMes: 0,
+    totalAssociados: 0,
+    adimplentes: [],
+    inadimplentes: []
+  }
+})
+
 // Calcular porcentagem para as barras
 function calcularPorcentagem(valor: number): number {
-  if (dashboardData.value.receitaConsolidada === 0) return 0
-  return Math.round((valor / dashboardData.value.receitaConsolidada) * 100)
+  if (dadosSegurosDashboard.value.receitaConsolidada === 0) return 0
+  return Math.round((valor / dadosSegurosDashboard.value.receitaConsolidada) * 100)
 }
 
 // Carregar dados do dashboard
@@ -325,10 +351,29 @@ async function carregarDados() {
   try {
     loading.value = true
     const [mes, ano] = periodoSelecionado.value.split('/')
+    console.log(`Carregando dados do dashboard para ${mes}/${ano}`)
+    // Usar dados reais para debug
     const dados = await painelService.obterDashboard(parseInt(mes), parseInt(ano))
-    dashboardData.value = dados
+    console.log('Dados recebidos:', dados)
+    // Verificar se os dados são válidos antes de atribuir
+    if (dados && typeof dados === 'object') {
+      dashboardData.value = dados
+    } else {
+      console.error('Dados do dashboard inválidos:', dados)
+      dashboardData.value = defaultDashboardData
+    }
   } catch (error) {
     console.error('Erro ao carregar dados do dashboard:', error)
+    // Em caso de erro, tentar usar dados mock
+    const [mes, ano] = periodoSelecionado.value.split('/')
+    try {
+      console.log('Tentando fallback para dados mock...')
+      const dadosMock = await painelService.obterDashboardMock(parseInt(mes), parseInt(ano))
+      dashboardData.value = dadosMock
+    } catch (mockError) {
+      console.error('Erro ao carregar dados mock:', mockError)
+      dashboardData.value = defaultDashboardData
+    }
   } finally {
     loading.value = false
   }

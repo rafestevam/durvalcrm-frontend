@@ -168,7 +168,7 @@ async function handleAuthCallback() {
         
         if (loginSuccess) {
           console.log('Login processado com sucesso, redirecionando...')
-          await router.push(ROUTES.DASHBOARD)
+          await router.push(ROUTES.PAINEL)
         } else {
           throw new Error('Falha no processamento final da autenticação')
         }
@@ -180,7 +180,7 @@ async function handleAuthCallback() {
         
         if (loginSuccess) {
           console.log('Login processado com sucesso (sem user info completo), redirecionando...')
-          await router.push(ROUTES.DASHBOARD)
+          await router.push(ROUTES.PAINEL)
         } else {
           throw new Error('Falha no processamento da autenticação')
         }

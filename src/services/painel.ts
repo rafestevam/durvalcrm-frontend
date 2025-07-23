@@ -6,7 +6,9 @@ export const painelService = {
     const response = await api.get('/dashboard', {
       params: { mes, ano }
     })
-    return response.data
+    console.log('Response completa do painel service:', response)
+    console.log('response.data:', response.data)
+    return response.data || response
   },
 
   async obterDashboardMock(mes: number, ano: number): Promise<DashboardData> {

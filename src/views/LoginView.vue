@@ -79,9 +79,9 @@ async function handleLogin() {
 }
 
 onMounted(async () => {
-  // Se já está autenticado, redireciona para o dashboard
+  // Se já está autenticado, redireciona para o painel
   if (authStore.isAuthenticated) {
-    router.push(ROUTES.DASHBOARD)
+    router.push(ROUTES.PAINEL)
   }
 })
 </script>

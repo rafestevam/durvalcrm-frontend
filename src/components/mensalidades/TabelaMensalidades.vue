@@ -123,7 +123,7 @@ function getStatusLabel(status: StatusMensalidade): string {
   return labels[status] || status
 }
 
-let debounceTimer: number | null = null
+let debounceTimer: ReturnType<typeof setTimeout> | null = null
 
 function handleVerQRCode(mensalidade: Mensalidade) {
   // Evitar múltiplos cliques

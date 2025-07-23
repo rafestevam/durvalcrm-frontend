@@ -19,7 +19,7 @@ const router = createRouter({
     {
       path: ROUTES.DASHBOARD,
       name: 'Dashboard',
-      redirect: ROUTES.ASSOCIADOS,
+      redirect: ROUTES.PAINEL,
       meta: { requiresAuth: true },
     },
     {
@@ -55,7 +55,7 @@ const router = createRouter({
     {
       path: '/:pathMatch(.*)*',
       name: 'NotFound',
-      redirect: ROUTES.DASHBOARD,
+      redirect: ROUTES.PAINEL,
     },
   ],
 })
