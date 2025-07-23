@@ -11,7 +11,7 @@ export const painelService = {
     return response.data || response
   },
 
-  async obterDashboardMock(mes: number, ano: number): Promise<DashboardData> {
+  async obterDashboardMock(_mes: number, _ano: number): Promise<DashboardData> {
     try {
       // Dados mockados para desenvolvimento
       const mockData: DashboardData = {

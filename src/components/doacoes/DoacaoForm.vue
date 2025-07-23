@@ -110,7 +110,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useAssociadosStore } from '@/stores/associados'
 import type { Doacao, DoacaoFormData, TipoDoacao } from '@/types/doacao'
-import type { Associado } from '@/types/associado'
+// import type { Associado } from '@/types/associado' // Unused import
 import { toLocalISOString } from '@/utils/dateUtils'
 
 interface Props {

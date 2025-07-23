@@ -95,7 +95,8 @@ interface Emits {
 }
 
 const props = defineProps<Props>()
-const emit = defineEmits<Emits>()
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const _emit = defineEmits<Emits>()
 
 const qrCanvas = ref<HTMLCanvasElement>()
 const pixCodeInput = ref<HTMLInputElement>()
