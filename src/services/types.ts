@@ -178,3 +178,9 @@ export interface DashboardData {
   adimplentes: Associado[]
   inadimplentes: Associado[]
 }
+
+export interface ReceitasPorMetodoPagamento {
+  totalPix: number
+  totalDinheiro: number
+  totalGeral: number
+}
