@@ -95,7 +95,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+// import { computed } from 'vue' // Unused import
 import type { Doacao, StatusDoacao } from '@/types/doacao'
 
 interface Props {

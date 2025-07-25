@@ -181,7 +181,7 @@ import AlertMessage from '@/components/common/AlertMessage.vue'
 import { formatters } from '@/utils/formatters'
 import { VENDA_ORIGENS } from '@/utils/constants'
 import { useVendasStore } from '@/stores/vendas'
-import type { Venda } from '@/services/types'
+// import type { Venda } from '@/services/types' // Unused import
 
 const vendasStore = useVendasStore()
 

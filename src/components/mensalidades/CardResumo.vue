@@ -29,7 +29,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+// import { computed } from 'vue' // Unused import
 
 interface Props {
   titulo: string
@@ -40,7 +40,8 @@ interface Props {
   porcentagemColor?: string
 }
 
-const props = withDefaults(defineProps<Props>(), {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const _props = withDefaults(defineProps<Props>(), {
   iconColor: 'text-gray-400',
   porcentagemColor: 'text-gray-900'
 })

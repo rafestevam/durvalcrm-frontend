@@ -155,7 +155,7 @@ export class AuthService {
   }
 
   // MÉTODO ATUALIZADO: handleCallback com melhor tratamento de estado
-  async handleCallback(code: string, redirectUri: string): Promise<TokenResponse> {
+  async handleCallback(code: string, _redirectUri: string): Promise<TokenResponse> {
     try {
       console.log('Processando callback OAuth...')
       
