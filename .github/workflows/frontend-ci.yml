@@ -95,6 +95,28 @@ jobs:
             dist/
           retention-days: 7
 
+      # 11. Build and push Docker image
+      - name: Build and push Docker image
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          echo "Building and pushing Docker image..."
+          
+          # Login to Docker Hub
+          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+          
+          # Build the Docker image
+          docker build -t durvalcrm-frontend:latest .
+          
+          # Tag for Docker Hub
+          docker tag durvalcrm-frontend:latest docker.io/rafestevam/durvalcrm-frontend:latest
+          docker tag durvalcrm-frontend:latest docker.io/rafestevam/durvalcrm-frontend:${{ github.sha }}
+          
+          # Push to Docker Hub
+          docker push docker.io/rafestevam/durvalcrm-frontend:latest
+          docker push docker.io/rafestevam/durvalcrm-frontend:${{ github.sha }}
+          
+          echo "✅ Docker image pushed successfully!"
+
   # Job for security and dependency checks
   security:
     name: Security & Dependency Checks
