@@ -1,8 +1,8 @@
 # =================================================================
 # ESTÁGIO 1: BUILDER
-# Usa Node.js 18 para compilar a aplicação Vue.js
+# Usa Node.js 22 para compilar a aplicação Vue.js
 # =================================================================
-FROM docker.io/node:18-alpine AS builder
+FROM docker.io/node:22-alpine AS builder
 
 # Define o diretório de trabalho
 WORKDIR /app
@@ -24,10 +24,22 @@ RUN npx vite build
 # ESTÁGIO 2: PRODUCTION
 # Usa Nginx Alpine para servir os arquivos estáticos
 # =================================================================
-FROM docker.io/nginx:1.25-alpine
+FROM docker.io/nginx:1.27-alpine
 
 # Remove a configuração padrão do Nginx
 RUN rm -rf /usr/share/nginx/html/*
+
+# Instala o OpenSSL para gerar certificados SSL
+RUN apk add --no-cache openssl
+
+# Cria diretório para certificados SSL
+RUN mkdir -p /etc/nginx/ssl
+
+# Gera certificado SSL auto-assinado
+RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+    -keyout /etc/nginx/ssl/nginx.key \
+    -out /etc/nginx/ssl/nginx.crt \
+    -subj "/C=BR/ST=SP/L=SaoPaulo/O=DurvalCRM/OU=IT/CN=localhost"
 
 # Copia os arquivos compilados do estágio builder
 COPY --from=builder /app/dist /usr/share/nginx/html
@@ -39,8 +51,8 @@ COPY nginx.conf /etc/nginx/nginx.conf
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-# Expõe a porta 80
-EXPOSE 80
+# Expõe a porta 8443 (HTTPS)
+EXPOSE 8443
 
 # Comando para iniciar o Nginx
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
