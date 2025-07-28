@@ -51,6 +51,14 @@ COPY nginx.conf /etc/nginx/nginx.conf
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
+# Define variáveis de ambiente padrão (podem ser sobrescritas em runtime)
+ENV VITE_API_BASE_URL="" \
+    VITE_KEYCLOAK_URL="" \
+    VITE_KEYCLOAK_REALM="durval-crm" \
+    VITE_KEYCLOAK_CLIENT_ID="durvalcrm-app" \
+    VITE_APP_NAME="DurvalCRM" \
+    VITE_APP_VERSION="1.0.0"
+
 # Expõe a porta 8443 (HTTPS)
 EXPOSE 8443
 
