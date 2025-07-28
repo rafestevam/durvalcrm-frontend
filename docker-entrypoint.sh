@@ -18,15 +18,28 @@ replace_env_vars() {
             # Cria um backup do arquivo original
             cp "$file" "$file.bak"
             
-            # Substitui as variáveis de ambiente
+            # Substitui as variáveis de ambiente usando envsubst
             envsubst "$vars" < "$file.bak" > "$file"
+            
+            # Substitui URLs hardcoded específicos por variáveis de ambiente
+            if [ -n "$VITE_API_BASE_URL" ]; then
+                # Remove /api do final da VITE_API_BASE_URL se existir
+                API_BASE=$(echo "$VITE_API_BASE_URL" | sed 's|/api$||')
+                # Substitui referências hardcoded
+                sed -i "s|http://localhost:8082/api|${VITE_API_BASE_URL}|g" "$file"
+                sed -i "s|http://localhost:8082|${API_BASE}|g" "$file"
+                sed -i "s|http://52\.186\.176\.31:8082/api|${VITE_API_BASE_URL}|g" "$file"
+                sed -i "s|http://52\.186\.176\.31:8082|${API_BASE}|g" "$file"
+                sed -i "s|https://52\.186\.176\.31:8082/api|${VITE_API_BASE_URL}|g" "$file"
+                sed -i "s|https://52\.186\.176\.31:8082|${API_BASE}|g" "$file"
+            fi
             
             # Remove o backup
             rm "$file.bak"
         fi
     done
     
-    echo "✅ Variáveis de ambiente substituídas com sucesso!"
+    echo "✅ Variáveis de ambiente e URLs hardcoded substituídas com sucesso!"
 }
 
 # Executa a substituição das variáveis se necessário
@@ -37,11 +50,18 @@ else
 fi
 
 # Exibe as configurações atuais
-echo "📋 Configurações:"
-echo "   API_BASE_URL: ${VITE_API_BASE_URL:-'usando padrão'}"
+echo "📋 Configurações aplicadas:"
+echo "   API_BASE_URL: ${VITE_API_BASE_URL:-'http://localhost:8082/api (padrão)'}"
 echo "   KEYCLOAK_URL: ${VITE_KEYCLOAK_URL:-'usando padrão'}"
 echo "   KEYCLOAK_REALM: ${VITE_KEYCLOAK_REALM:-'usando padrão'}"
 echo "   KEYCLOAK_CLIENT_ID: ${VITE_KEYCLOAK_CLIENT_ID:-'usando padrão'}"
+echo ""
+if [ -n "$VITE_API_BASE_URL" ]; then
+    echo "🔄 URLs hardcoded substituídas:"
+    echo "   http://localhost:8082/* → $VITE_API_BASE_URL"
+    echo "   http://52.186.176.31:8082/* → $VITE_API_BASE_URL"
+    echo "   https://52.186.176.31:8082/* → $VITE_API_BASE_URL"
+fi
 
 # Executa o comando passado como argumento
 echo "🎯 Iniciando Nginx..."
