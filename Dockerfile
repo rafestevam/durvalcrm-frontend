@@ -63,5 +63,6 @@ ENV VITE_API_BASE_URL="" \
 EXPOSE 8443
 
 # Comando para iniciar o Nginx
+# -----------------------------
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 CMD ["nginx", "-g", "daemon off;"]
