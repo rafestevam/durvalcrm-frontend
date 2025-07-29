@@ -32,6 +32,10 @@ replace_env_vars() {
                 sed -i "s|http://52\.186\.176\.31:8082|${API_BASE}|g" "$file"
                 sed -i "s|https://52\.186\.176\.31:8082/api|${VITE_API_BASE_URL}|g" "$file"
                 sed -i "s|https://52\.186\.176\.31:8082|${API_BASE}|g" "$file"
+                sed -i "s|https://52\.186\.176\.31/api|${VITE_API_BASE_URL}|g" "$file"
+                sed -i "s|https://52\.186\.176\.31|${API_BASE}|g" "$file"
+                sed -i "s|https://localhost:8443|${API_BASE}|g" "$file"
+                sed -i "s|http://localhost:8443|${API_BASE}|g" "$file"
             fi
             
             # Remove o backup
@@ -51,7 +55,7 @@ fi
 
 # Exibe as configurações atuais
 echo "📋 Configurações aplicadas:"
-echo "   API_BASE_URL: ${VITE_API_BASE_URL:-'http://localhost:8082/api (padrão)'}"
+echo "   API_BASE_URL: ${VITE_API_BASE_URL:-'http://localhost:8080/api (padrão)'}"
 echo "   KEYCLOAK_URL: ${VITE_KEYCLOAK_URL:-'usando padrão'}"
 echo "   KEYCLOAK_REALM: ${VITE_KEYCLOAK_REALM:-'usando padrão'}"
 echo "   KEYCLOAK_CLIENT_ID: ${VITE_KEYCLOAK_CLIENT_ID:-'usando padrão'}"
@@ -61,6 +65,7 @@ if [ -n "$VITE_API_BASE_URL" ]; then
     echo "   http://localhost:8082/* → $VITE_API_BASE_URL"
     echo "   http://52.186.176.31:8082/* → $VITE_API_BASE_URL"
     echo "   https://52.186.176.31:8082/* → $VITE_API_BASE_URL"
+    echo "   https://52.186.176.31/* → $VITE_API_BASE_URL"
 fi
 
 # Executa o comando passado como argumento

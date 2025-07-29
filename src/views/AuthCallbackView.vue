@@ -88,6 +88,13 @@ const debugInfo = computed(() => {
 })
 
 onMounted(async () => {
+  // Verificar se estamos em about:blank#blocked
+  if (window.location.href === 'about:blank#blocked' || window.location.href.includes('#blocked')) {
+    console.log('Detectado about:blank#blocked, tentando recuperar...')
+    handleBlockedRedirect()
+    return
+  }
+  
   await handleAuthCallback()
 })
 
@@ -199,6 +206,36 @@ async function handleAuthCallback() {
       redirectToLogin()
     }, 5000)
   }
+}
+
+function handleBlockedRedirect() {
+  console.log('Tratando redirecionamento bloqueado...')
+  
+  // Tentar obter informações do opener ou parent
+  if (window.opener && window.opener !== window) {
+    console.log('Detectado popup bloqueado, tentando fechar...')
+    try {
+      // Notificar a janela pai sobre o problema
+      window.opener.postMessage({ type: 'AUTH_BLOCKED' }, window.location.origin)
+      window.close()
+      return
+    } catch (e) {
+      console.error('Erro ao comunicar com janela pai:', e)
+    }
+  }
+  
+  // Tentar redirecionar para a aplicação principal
+  error.value = 'Redirecionamento bloqueado pelo navegador. Redirecionando...'
+  isLoading.value = false
+  
+  setTimeout(() => {
+    try {
+      window.location.replace('http://localhost:8080/auth/callback' + window.location.search)
+    } catch (e) {
+      console.error('Erro ao redirecionar:', e)
+      redirectToLogin()
+    }
+  }, 2000)
 }
 
 async function redirectToLogin() {
