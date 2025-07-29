@@ -29,23 +29,11 @@ FROM docker.io/nginx:1.27-alpine
 # Remove a configuração padrão do Nginx
 RUN rm -rf /usr/share/nginx/html/*
 
-# Instala o OpenSSL para gerar certificados SSL
-RUN apk add --no-cache openssl
-
-# Cria diretório para certificados SSL
-RUN mkdir -p /etc/nginx/ssl
-
-# Gera certificado SSL auto-assinado
-RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-    -keyout /etc/nginx/ssl/nginx.key \
-    -out /etc/nginx/ssl/nginx.crt \
-    -subj "/C=BR/ST=SP/L=SaoPaulo/O=DurvalCRM/OU=IT/CN=localhost"
-
 # Copia os arquivos compilados do estágio builder
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Copia configuração customizada do Nginx (será criada se necessário)
-COPY nginx.conf /etc/nginx/nginx.conf
+# Copia configuração customizada do Nginx para HTTP
+COPY nginx-http.conf /etc/nginx/nginx.conf
 
 # Adiciona um script de inicialização para substituir variáveis de ambiente
 COPY docker-entrypoint.sh /usr/local/bin/
@@ -59,8 +47,8 @@ ENV VITE_API_BASE_URL="" \
     VITE_APP_NAME="DurvalCRM" \
     VITE_APP_VERSION="1.0.0"
 
-# Expõe a porta 8443 (HTTPS)
-EXPOSE 8443
+# Expõe a porta 8080 (HTTP)
+EXPOSE 8080
 
 # Comando para iniciar o Nginx
 # -----------------------------

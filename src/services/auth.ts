@@ -146,7 +146,14 @@ export class AuthService {
       const authUrl = `${loginInfo.authServerUrl}/protocol/openid-connect/auth?${authParams.toString()}`
       
       console.log('Redirecionando para:', authUrl)
-      window.location.href = authUrl
+      
+      // Usar replace para evitar problemas com about:blank#blocked
+      try {
+        window.location.replace(authUrl)
+      } catch (error) {
+        console.warn('Erro com location.replace, tentando location.href:', error)
+        window.location.href = authUrl
+      }
       
     } catch (error) {
       console.error('Erro ao iniciar login:', error)
