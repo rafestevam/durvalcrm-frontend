@@ -164,8 +164,8 @@ async function gerarQRCode() {
       }
     })
     console.log('QR Code gerado com sucesso')
-  } catch (error) {
-    console.error('Erro ao gerar QR Code:', error)
+  } catch (err) {
+    console.error('Erro ao gerar QR Code:', err)
     error.value = 'Erro ao gerar QR Code'
   }
 }

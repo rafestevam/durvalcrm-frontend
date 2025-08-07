@@ -3,7 +3,7 @@ import { useAuthStore } from '@/stores/auth'
 import { ROUTES } from '@/utils/constants'
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHistory(import.meta.env.VITE_APP_BASE_URL || import.meta.env.BASE_URL),
   routes: [
     {
       path: ROUTES.LOGIN,

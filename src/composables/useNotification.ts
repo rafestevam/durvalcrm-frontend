@@ -21,7 +21,7 @@ export function useNotification() {
     
     notifications.value.push(newNotification)
     
-    if (newNotification.duration > 0) {
+    if (newNotification.duration && newNotification.duration > 0) {
       setTimeout(() => {
         removeNotification(id)
       }, newNotification.duration)

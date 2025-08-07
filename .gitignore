@@ -23,6 +23,7 @@ coverage
 # Dependency directories
 node_modules/
 jspm_packages/
+target/
 
 # TypeScript cache
 *.tsbuildinfo

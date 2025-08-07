@@ -86,7 +86,7 @@ const chartOptions: ChartOptions<'doughnut'> = {
               strokeStyle: dataset.borderColor ? 
                 (Array.isArray(dataset.borderColor) ? dataset.borderColor[i] : dataset.borderColor) : 
                 '#000',
-              lineWidth: dataset.borderWidth || 0,
+              lineWidth: typeof dataset.borderWidth === 'number' ? dataset.borderWidth : 0,
               hidden: false,
               index: i,
               datasetIndex: 0,

@@ -152,7 +152,7 @@ watch(() => props.doacao, (novaDoacao) => {
 
 onMounted(async () => {
   if (associados.value.length === 0) {
-    await associadosStore.carregarAssociados()
+    await associadosStore.fetchAssociados()
   }
 })
 

@@ -121,7 +121,7 @@ export const APP_CONFIG = {
   
   // Configurações de API
   API: {
-    TIMEOUT_MS: 10000,
+    TIMEOUT_MS: 30000, // Aumentado para 30 segundos
     RETRY_ATTEMPTS: 3,
     RETRY_DELAY_MS: 1000,
   },

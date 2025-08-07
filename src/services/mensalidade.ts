@@ -202,7 +202,7 @@ export const mensalidadeService = {
         metodoPagamento: dadosPagamento?.metodoPagamento || 'PIX' // PIX como padrão
       }
       
-      await apiService.patch<void>(
+      await apiService.post<void>(
         `/mensalidades/${id}/pagar`, 
         dados
       )

@@ -58,7 +58,7 @@ export class AuthService {
       console.log('Renovando token...')
       
       // Fazer requisição para renovar token
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8082/api'}/auth/refresh`, {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'https://durvalcrm.org/crm/api'}/auth/refresh`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -126,7 +126,8 @@ export class AuthService {
       const codeChallenge = await this.generateCodeChallenge(codeVerifier)
       
       // Salvar informações para o callback
-      const redirectUri = `${window.location.origin}/auth/callback`
+      const baseUrl = import.meta.env.VITE_APP_BASE_URL || ''
+      const redirectUri = `${window.location.origin}${baseUrl}/auth/callback`
       sessionStorage.setItem('oauth_state', state)
       sessionStorage.setItem('oauth_redirect_uri', redirectUri)
       sessionStorage.setItem('oauth_client_id', loginInfo.clientId)
@@ -205,7 +206,23 @@ export class AuthService {
         codeVerifier: codeVerifier.substring(0, 8) + '...'
       })
       
-      const responseData = await apiService.post<TokenResponse>('/auth/callback', callbackData)
+      // Usar fetch diretamente para evitar problemas de proxy
+      const apiUrl = import.meta.env.VITE_API_BASE_URL || 'https://durvalcrm.org/crm/api'
+      
+      const response = await fetch(`${apiUrl}/auth/callback`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(callbackData)
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(`HTTP ${response.status}: ${errorData.message || response.statusText}`)
+      }
+
+      const responseData = await response.json()
       
       if (!responseData?.access_token) {
         throw new Error('Token não recebido na resposta')
