@@ -21,26 +21,37 @@ export default defineConfig({
     cors: true,
     proxy: {
       '/api': {
-        target: 'http://localhost:8082',
+        target: 'https://20.127.155.169:8443',
         changeOrigin: true,
         secure: false,
-        // REMOVIDO O REWRITE - mantém o /api no caminho
+        rewrite: (path) => path.replace(/^\/api/, '/durvalcrm/api'),
         configure: (proxy, _options) => {
           proxy.on('error', (err, _req, _res) => {
             console.log('❌ Proxy error:', err);
           });
           proxy.on('proxyReq', (proxyReq, req, _res) => {
-            console.log('🔄 Sending Request to Backend:', req.method, req.url);
+            console.log('🔄 Sending Request to Remote Backend:', req.method, req.url);
           });
           proxy.on('proxyRes', (proxyRes, req, _res) => {
-            console.log('✅ Received Response from Backend:', proxyRes.statusCode, req.url);
+            console.log('✅ Received Response from Remote Backend:', proxyRes.statusCode, req.url);
           });
         },
       }
     }
   },
+  base: process.env.NODE_ENV === 'production' ? '/crm/' : '/',
   build: {
     outDir: 'dist',
-    sourcemap: true
+    sourcemap: true,
+    assetsDir: 'assets',
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor': ['vue', 'vue-router', 'pinia', 'axios'],
+          'ui': ['@headlessui/vue', '@heroicons/vue'],
+          'charts': ['chart.js', 'vue-chartjs']
+        }
+      }
+    }
   }
 })

@@ -11,7 +11,7 @@ import { APP_CONFIG } from '@/utils/constants'
 
 // Configuração base do axios para todas as requisições
 const apiClient: AxiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8082/api',
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'https://durvalcrm.org/crm/api',
   timeout: APP_CONFIG.API.TIMEOUT_MS,
   headers: {
     'Content-Type': 'application/json',

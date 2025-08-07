@@ -156,7 +156,8 @@ async function handleAuthCallback() {
     console.log('Processando código de autorização...', { code: code.substring(0, 10) + '...' })
     
     // CORREÇÃO: Chamar handleCallback apenas com code e redirectUri
-    const redirectUri = `${window.location.origin}/auth/callback`
+    const baseUrl = import.meta.env.VITE_APP_BASE_URL || ''
+    const redirectUri = `${window.location.origin}${baseUrl}/auth/callback`
     const tokenResponse = await authService.handleCallback(code, redirectUri)
     
     if (tokenResponse?.access_token) {
@@ -230,7 +231,8 @@ function handleBlockedRedirect() {
   
   setTimeout(() => {
     try {
-      window.location.replace('http://localhost:8080/auth/callback' + window.location.search)
+      const baseUrl = import.meta.env.VITE_APP_BASE_URL || ''
+      window.location.replace(`${window.location.origin}${baseUrl}/auth/callback` + window.location.search)
     } catch (e) {
       console.error('Erro ao redirecionar:', e)
       redirectToLogin()
