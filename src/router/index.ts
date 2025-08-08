@@ -64,10 +64,22 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
 
+  console.log('Router guard:', {
+    from: from.path,
+    to: to.path,
+    requiresAuth: to.meta.requiresAuth,
+    requiresGuest: to.meta.requiresGuest,
+    isAuthenticated: authStore.isAuthenticated
+  })
+
   // Rotas que requerem autenticação
   if (to.meta.requiresAuth) {
+    console.log('Rota requer autenticação, validando sessão...')
     const isValid = await authStore.validateSession()
+    console.log('Validação da sessão:', isValid)
+    
     if (!isValid) {
+      console.log('Sessão inválida, redirecionando para login')
       next(ROUTES.LOGIN)
       return
     }
@@ -75,10 +87,12 @@ router.beforeEach(async (to, from, next) => {
 
   // Rotas que requerem usuário deslogado (como login)
   if (to.meta.requiresGuest && authStore.isAuthenticated) {
+    console.log('Usuário já autenticado, redirecionando para dashboard')
     next(ROUTES.DASHBOARD)
     return
   }
 
+  console.log('Router guard: permitindo navegação')
   next()
 })
 

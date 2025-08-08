@@ -14,7 +14,7 @@ export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = computed(() => {
     const hasToken = !!token.value
     const hasUser = !!user.value
-    const tokenNotExpired = !authService.isTokenExpiringSoon()
+    const tokenNotExpired = !authService.isTokenExpired() // Use isTokenExpired instead of isTokenExpiringSoon
     
     return hasToken && hasUser && tokenNotExpired
   })
@@ -74,7 +74,8 @@ export const useAuthStore = defineStore('auth', () => {
 
     try {
       // Verificar se o token está próximo da expiração ANTES de fazer chamadas
-      if (authService.isTokenExpiringSoon()) {
+      // Use um threshold menor para não ser muito agressivo
+      if (authService.isTokenExpiringSoon(0.5)) { // 30 segundos antes da expiração
         console.log('Token expirando em breve, fazendo logout preventivo')
         logout()
         return false

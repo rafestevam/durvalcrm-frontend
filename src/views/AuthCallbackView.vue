@@ -172,11 +172,25 @@ async function handleAuthCallback() {
         console.log('Informações do usuário obtidas:', userInfo)
         
         // Processar login no store
+        console.log('Chamando authStore.login...')
         const loginSuccess = await authStore.login(tokenResponse.access_token)
         
+        console.log('Login result:', loginSuccess)
+        console.log('Auth store state:', {
+          isAuthenticated: authStore.isAuthenticated,
+          user: authStore.user,
+          token: !!authStore.token
+        })
+        
         if (loginSuccess) {
-          console.log('Login processado com sucesso, redirecionando...')
-          await router.push(ROUTES.PAINEL)
+          console.log('Login processado com sucesso, redirecionando para PAINEL...')
+          
+          // Force clear any existing navigation guards issues
+          await new Promise(resolve => setTimeout(resolve, 200))
+          
+          // Replace instead of push to avoid back button issues
+          await router.replace(ROUTES.PAINEL)
+          console.log('Navegação para PAINEL concluída')
         } else {
           throw new Error('Falha no processamento final da autenticação')
         }

@@ -299,14 +299,27 @@ export class AuthService {
   }
 
   // Método para verificar se o token está próximo da expiração
-  isTokenExpiringSoon(thresholdMinutes: number = 5): boolean {
+  isTokenExpiringSoon(thresholdMinutes: number = 1): boolean {
     const expiresAt = localStorage.getItem('token_expires_at')
     if (!expiresAt) return true
     
     const expirationTime = parseInt(expiresAt)
     const thresholdTime = Date.now() + (thresholdMinutes * 60 * 1000)
     
-    return expirationTime <= thresholdTime
+    const isExpiringSoon = expirationTime <= thresholdTime
+    
+    // Debug logging
+    if (import.meta.env.DEV) {
+      console.log('Token expiration check:', {
+        expiresAt: new Date(expirationTime).toISOString(),
+        threshold: `${thresholdMinutes} minutes`,
+        thresholdTime: new Date(thresholdTime).toISOString(),
+        currentTime: new Date().toISOString(),
+        isExpiringSoon
+      })
+    }
+    
+    return isExpiringSoon
   }
 
   // Método para obter token armazenado
