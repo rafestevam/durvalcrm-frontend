@@ -11,12 +11,22 @@ import { APP_CONFIG } from '@/utils/constants'
 
 // Configuração base do axios para todas as requisições
 const apiClient: AxiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'https://durvalcrm.org/crm/api',
+  baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
   timeout: APP_CONFIG.API.TIMEOUT_MS,
   headers: {
     'Content-Type': 'application/json',
   },
 })
+
+// Log da configuração em desenvolvimento
+if (import.meta.env.DEV) {
+  console.log('🔧 API Configuration:', {
+    environment: import.meta.env.VITE_APP_ENVIRONMENT,
+    baseURL: import.meta.env.VITE_API_BASE_URL,
+    keycloakURL: import.meta.env.VITE_KEYCLOAK_URL,
+    appBaseURL: import.meta.env.VITE_APP_BASE_URL,
+  })
+}
 
 // Interceptor de requisição para adicionar o token
 apiClient.interceptors.request.use(
