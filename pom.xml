@@ -21,6 +21,26 @@
         <frontend-maven-plugin.version>1.15.0</frontend-maven-plugin.version>
         <node.version>v20.10.0</node.version>
         <npm.version>10.2.3</npm.version>
+        
+        <!-- Deployment Configuration -->
+        <!-- 
+        Usage Examples:
+        - Development: mvn clean package wildfly:deploy
+        - Staging: mvn clean package wildfly:deploy -Pstaging
+        - Production: mvn clean package wildfly:deploy -Pproduction
+        
+        Staging Environment:
+        - Console: https://localhost:9443/wildfly/ (admin/admin123)
+        - Application will be available at: https://localhost:9443/crm/
+        - Management Interface: https://localhost:9443/wildfly (via NGINX proxy)
+        
+        Testing Deployment:
+        1. Start Vagrant VM: vagrant up (in deployment/environments/staging/Vagrant/)
+        2. Deploy: mvn clean package wildfly:deploy -Pstaging
+        3. Access: https://localhost:9443/crm/
+        
+        Note: Deployment via NGINX HTTPS proxy on port 9443 - no SSH tunnel needed
+        -->
     </properties>
     
     <dependencies>
@@ -157,9 +177,6 @@
         <!-- Development Profile -->
         <profile>
             <id>development</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
             <properties>
                 <maven.test.skip>false</maven.test.skip>
                 <wildfly.hostname>127.0.0.1</wildfly.hostname>
@@ -171,16 +188,60 @@
         </profile>
         
         <!-- Staging Profile -->
+        <!-- Deploy to WildFly through NGINX proxy at https://localhost:9443/wildfly -->
+        <!-- Uses HTTPS proxy since only port 9443 is exposed from VM -->
         <profile>
             <id>staging</id>
             <properties>
                 <maven.test.skip>true</maven.test.skip>
-                <wildfly.hostname>staging.durvalcrm.org</wildfly.hostname>
-                <wildfly.port>9993</wildfly.port>
+                <!-- Deploy via NGINX proxy to WildFly management interface -->
+                <wildfly.hostname>localhost</wildfly.hostname>
+                <wildfly.port>9443</wildfly.port>
                 <wildfly.protocol>https-remoting</wildfly.protocol>
                 <wildfly.username>admin</wildfly.username>
                 <wildfly.password>admin123</wildfly.password>
+                <!-- Additional staging-specific properties -->
+                <wildfly.deployment.name>durvalcrm-frontend.war</wildfly.deployment.name>
+                <wildfly.context.root>/durvalcrm-frontend</wildfly.context.root>
+                <!-- NGINX proxy configuration -->
+                <wildfly.management.url>https://localhost:9443/wildfly</wildfly.management.url>
+                <!-- SSL/TLS properties for self-signed certificates -->
+                <wildfly.trustAll>true</wildfly.trustAll>
+                <wildfly.hostnameVerification>false</wildfly.hostnameVerification>
             </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.wildfly.plugins</groupId>
+                        <artifactId>wildfly-maven-plugin</artifactId>
+                        <configuration>
+                            <hostname>${wildfly.hostname}</hostname>
+                            <port>${wildfly.port}</port>
+                            <protocol>${wildfly.protocol}</protocol>
+                            <username>${wildfly.username}</username>
+                            <password>${wildfly.password}</password>
+                            <timeout>180000</timeout>
+                            <filename>${project.build.finalName}.war</filename>
+                            <force>true</force>
+                            <!-- Add staging-specific deployment options -->
+                            <checkPackaging>false</checkPackaging>
+                            <!-- Runtime name for the deployment -->
+                            <name>${project.build.finalName}.war</name>
+                            <!-- SSL/TLS configuration for HTTPS proxy -->
+                            <managementUrl>${wildfly.management.url}</managementUrl>
+                            <!-- SSL Certificate configuration for self-signed certificates -->
+                            <trustAll>true</trustAll>
+                            <hostnameVerification>false</hostnameVerification>
+                            <!-- JVM options for SSL/TLS -->
+                            <jvmArgs>
+                                <jvmArg>-Dtrust_all_cert=true</jvmArg>
+                                <jvmArg>-Dcom.sun.net.ssl.checkRevocation=false</jvmArg>
+                                <jvmArg>-Dtrust_all_cert=true</jvmArg>
+                            </jvmArgs>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
         
         <!-- Production Profile -->
