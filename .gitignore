@@ -24,6 +24,7 @@ coverage
 node_modules/
 jspm_packages/
 target/
+temp-war/
 
 # TypeScript cache
 *.tsbuildinfo
