@@ -4,7 +4,7 @@
  */
 
 import { setActivePinia, createPinia } from 'pinia'
-import { vi } from 'vitest'
+import { vi, expect } from 'vitest'
 
 /**
  * Creates and activates a fresh Pinia instance for testing

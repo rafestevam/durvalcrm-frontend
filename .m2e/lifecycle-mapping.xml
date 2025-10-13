@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lifecycleMappingMetadata>
+    <pluginExecutions>
+        <!--
+        Configure frontend-maven-plugin to be ignored by Eclipse/m2e during incremental builds.
+        This prevents the IDE from trying to run npm commands automatically.
+        -->
+        <pluginExecution>
+            <pluginExecutionFilter>
+                <groupId>com.github.eirslett</groupId>
+                <artifactId>frontend-maven-plugin</artifactId>
+                <versionRange>[1.0,)</versionRange>
+                <goals>
+                    <goal>install-node-and-npm</goal>
+                    <goal>npm</goal>
+                    <goal>yarn</goal>
+                    <goal>bower</goal>
+                    <goal>grunt</goal>
+                    <goal>gulp</goal>
+                    <goal>jspm</goal>
+                    <goal>karma</goal>
+                    <goal>webpack</goal>
+                </goals>
+            </pluginExecutionFilter>
+            <action>
+                <ignore />
+            </action>
+        </pluginExecution>
+    </pluginExecutions>
+</lifecycleMappingMetadata>
