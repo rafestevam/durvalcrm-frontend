@@ -21,6 +21,21 @@
         <frontend-maven-plugin.version>1.15.0</frontend-maven-plugin.version>
         <node.version>v20.10.0</node.version>
         <npm.version>10.2.3</npm.version>
+
+        <!--
+        Skip frontend build during IDE incremental builds (set to false for CLI builds)
+
+        IDE Configuration:
+        - Eclipse/VS Code: The .m2e/lifecycle-mapping.xml file tells the IDE to ignore frontend-maven-plugin
+        - Default: skipFrontend=true (prevents automatic npm builds during IDE refresh)
+        - Profiles override this to false when building via CLI (mvn clean package)
+
+        Usage:
+        - For development: Use "npm run dev" directly instead of Maven
+        - For production builds: Use "mvn clean package -Pdevelopment" (or -Pstaging/-Pproduction)
+        - To force build in IDE: Right-click project > Run As > Maven Build... > Goals: "clean package"
+        -->
+        <skipFrontend>true</skipFrontend>
         
         <!-- Deployment Configuration -->
         <!-- 
@@ -62,12 +77,14 @@
                 <groupId>com.github.eirslett</groupId>
                 <artifactId>frontend-maven-plugin</artifactId>
                 <version>${frontend-maven-plugin.version}</version>
-                
+
                 <configuration>
                     <workingDirectory>.</workingDirectory>
                     <installDirectory>target</installDirectory>
+                    <!-- Skip during Eclipse/IDE incremental builds -->
+                    <skip>${skipFrontend}</skip>
                 </configuration>
-                
+
                 <executions>
                     <!-- Instalar Node e NPM -->
                     <execution>
@@ -81,7 +98,7 @@
                             <npmVersion>${npm.version}</npmVersion>
                         </configuration>
                     </execution>
-                    
+
                     <!-- Instalar dependências -->
                     <execution>
                         <id>npm install</id>
@@ -93,7 +110,7 @@
                             <arguments>install --legacy-peer-deps</arguments>
                         </configuration>
                     </execution>
-                    
+
                     <!-- Build do Vue -->
                     <execution>
                         <id>npm run build</id>
@@ -190,8 +207,12 @@
         <!-- Development Profile -->
         <profile>
             <id>development</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
             <properties>
                 <maven.test.skip>false</maven.test.skip>
+                <skipFrontend>false</skipFrontend>
                 <wildfly.hostname>127.0.0.1</wildfly.hostname>
                 <wildfly.port>9991</wildfly.port>
                 <wildfly.protocol>remote+http</wildfly.protocol>
@@ -207,6 +228,7 @@
             <id>staging</id>
             <properties>
                 <maven.test.skip>true</maven.test.skip>
+                <skipFrontend>false</skipFrontend>
                 <!-- Alternative: Use SSH tunnel to access WildFly management directly -->
                 <wildfly.hostname>localhost</wildfly.hostname>
                 <wildfly.port>9443</wildfly.port>
@@ -306,6 +328,7 @@
             <id>production</id>
             <properties>
                 <maven.test.skip>true</maven.test.skip>
+                <skipFrontend>false</skipFrontend>
                 <!-- Production configuration for durvalcrm.org domain with HTTPS on port 9443 -->
                 <wildfly.hostname>durvalcrm.org</wildfly.hostname>
                 <wildfly.port>9443</wildfly.port>

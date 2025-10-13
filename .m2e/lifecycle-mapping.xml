@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lifecycleMappingMetadata>
+    <pluginExecutions>
+        <!-- Configure frontend-maven-plugin to be ignored by Eclipse/m2e during incremental builds -->
+        <pluginExecution>
+            <pluginExecutionFilter>
+                <groupId>com.github.eirslett</groupId>
+                <artifactId>frontend-maven-plugin</artifactId>
+                <versionRange>[1.0,)</versionRange>
+                <goals>
+                    <goal>install-node-and-npm</goal>
+                    <goal>npm</goal>
+                </goals>
+            </pluginExecutionFilter>
+            <action>
+                <ignore />
+            </action>
+        </pluginExecution>
+    </pluginExecutions>
+</lifecycleMappingMetadata>
