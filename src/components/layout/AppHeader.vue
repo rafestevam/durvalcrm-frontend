@@ -77,9 +77,13 @@ const authStore = useAuthStore()
 
 const showUserMenu = ref(false)
 
+// Emit para comunicar com AppLayout
+const emit = defineEmits<{
+  (e: 'toggle-mobile-menu'): void
+}>()
+
 function toggleMobileMenu() {
-  // Implementar toggle do menu mobile se necessário
-  console.log('Toggle mobile menu')
+  emit('toggle-mobile-menu')
 }
 
 function toggleUserMenu() {
