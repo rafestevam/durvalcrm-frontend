@@ -1,15 +1,24 @@
 <template>
-  <nav class="fixed inset-y-0 left-0 z-40 w-64 bg-white shadow-lg border-r border-gray-200">
+  <nav class="fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg border-r border-gray-200">
     <div class="flex h-full flex-col">
       <!-- Logo -->
-      <div class="flex h-16 items-center px-6 border-b border-gray-200">
+      <div class="flex h-16 items-center justify-between px-6 border-b border-gray-200">
         <h2 class="text-lg font-bold text-blue-600">
           DurvalCRM
         </h2>
+        <!-- Close button for mobile -->
+        <button
+          type="button"
+          class="lg:hidden -mr-2 inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
+          @click="$emit('navigate')"
+        >
+          <span class="sr-only">Fechar menu</span>
+          <XMarkIcon class="h-6 w-6" aria-hidden="true" />
+        </button>
       </div>
-      
+
       <!-- Navigation Links -->
-      <div class="flex-1 px-4 py-6">
+      <div class="flex-1 px-4 py-6 overflow-y-auto">
         <ul class="space-y-2">
           <li v-for="item in navigation" :key="item.name">
             <router-link
@@ -20,6 +29,7 @@
                   ? 'bg-blue-100 text-blue-700'
                   : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
               ]"
+              @click="$emit('navigate')"
             >
               <component
                 :is="item.icon"
@@ -36,7 +46,7 @@
           </li>
         </ul>
       </div>
-      
+
       <!-- Footer -->
       <div class="border-t border-gray-200 p-4">
         <p class="text-xs text-gray-500 text-center">
@@ -55,7 +65,13 @@ import {
   GiftIcon,
   ChartBarIcon,
 } from '@heroicons/vue/24/outline'
+import { XMarkIcon } from '@heroicons/vue/24/outline'
 import { APP_CONFIG, ROUTES } from '@/utils/constants'
+
+// Emit event when navigation item is clicked (para fechar o menu mobile)
+defineEmits<{
+  (e: 'navigate'): void
+}>()
 
 const navigation = [
   {
