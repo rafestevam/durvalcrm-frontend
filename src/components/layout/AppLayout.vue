@@ -8,10 +8,10 @@
 
       <!-- Mobile Navigation Overlay -->
       <Transition
-        enter-active-class="transition-opacity ease-linear duration-300"
+        enter-active-class="transition-opacity ease-out duration-200"
         enter-from-class="opacity-0"
         enter-to-class="opacity-100"
-        leave-active-class="transition-opacity ease-linear duration-300"
+        leave-active-class="transition-opacity ease-in duration-150"
         leave-from-class="opacity-100"
         leave-to-class="opacity-0"
       >
@@ -24,12 +24,12 @@
 
       <!-- Mobile Navigation Sidebar -->
       <Transition
-        enter-active-class="transition ease-in-out duration-300 transform"
-        enter-from-class="-translate-x-full"
-        enter-to-class="translate-x-0"
-        leave-active-class="transition ease-in-out duration-300 transform"
-        leave-from-class="translate-x-0"
-        leave-to-class="-translate-x-full"
+        enter-active-class="transition-all ease-out duration-300 transform"
+        enter-from-class="-translate-x-full opacity-80 scale-95"
+        enter-to-class="translate-x-0 opacity-100 scale-100"
+        leave-active-class="transition-all ease-in duration-200 transform"
+        leave-from-class="translate-x-0 opacity-100 scale-100"
+        leave-to-class="-translate-x-full opacity-80 scale-95"
       >
         <div v-if="mobileMenuOpen" class="lg:hidden">
           <AppNavigation @navigate="closeMobileMenu" />
