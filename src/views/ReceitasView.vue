@@ -71,7 +71,7 @@
     <BaseModal v-model:show="showModal" :title="isEditMode ? 'Editar Receita' : 'Nova Receita'">
       <form @submit.prevent="salvar" class="space-y-4">
         <BaseInput v-model="form.descricao" label="Descrição *" required />
-        <BaseInput v-model.number="form.valor" type="number" step="0.01" label="Valor *" required />
+        <BaseInput v-model="form.valor as any" type="number" step="0.01" label="Valor *" required />
         <BaseInput v-model="form.dataReceita" type="date" label="Data Receita *" required />
 
         <div>

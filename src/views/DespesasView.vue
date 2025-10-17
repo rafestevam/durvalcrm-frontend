@@ -71,7 +71,7 @@
                     <BaseButton v-if="despesa.statusPagamento === 'PENDENTE'" variant="outline" size="sm" @click="openEditModal(despesa)">
                       Editar
                     </BaseButton>
-                    <BaseButton v-if="despesa.statusPagamento === 'PENDENTE'" variant="warning" size="sm" @click="cancelar(despesa.id!)">
+                    <BaseButton v-if="despesa.statusPagamento === 'PENDENTE'" variant="danger" size="sm" @click="cancelar(despesa.id!)">
                       Cancelar
                     </BaseButton>
                   </div>
@@ -87,7 +87,7 @@
     <BaseModal v-model:show="showModal" :title="isEditMode ? 'Editar Despesa' : 'Nova Despesa'">
       <form @submit.prevent="salvar" class="space-y-4">
         <BaseInput v-model="form.descricao" label="Descrição *" required />
-        <BaseInput v-model.number="form.valor" type="number" step="0.01" label="Valor *" required />
+        <BaseInput v-model="form.valor as any" type="number" step="0.01" label="Valor *" required />
         <BaseInput v-model="form.dataDespesa" type="date" label="Data Despesa *" required />
         <BaseInput v-model="form.dataVencimento" type="date" label="Data Vencimento *" required />
 

@@ -101,7 +101,7 @@
                     </BaseButton>
                     <BaseButton
                       v-if="categoria.ativa"
-                      variant="warning"
+                      variant="danger"
                       size="sm"
                       @click="desativar(categoria.id!)"
                     >
