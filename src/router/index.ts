@@ -53,6 +53,30 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: ROUTES.CATEGORIAS_FINANCEIRAS,
+      name: 'CategoriasFinanceiras',
+      component: () => import('@/views/CategoriasFinanceirasView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: ROUTES.RECEITAS,
+      name: 'Receitas',
+      component: () => import('@/views/ReceitasView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: ROUTES.DESPESAS,
+      name: 'Despesas',
+      component: () => import('@/views/DespesasView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: ROUTES.RELATORIOS_FINANCEIROS,
+      name: 'RelatoriosFinanceiros',
+      component: () => import('@/views/RelatoriosFinanceirosView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
       path: '/:pathMatch(.*)*',
       name: 'NotFound',
       redirect: ROUTES.PAINEL,

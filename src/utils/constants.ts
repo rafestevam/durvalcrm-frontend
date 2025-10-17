@@ -20,9 +20,15 @@ export const ROUTES = {
   DOACOES: '/doacoes',
   
   PAINEL: '/painel',
-  
+
   RECONCILIACAO: '/reconciliacao',
-  
+
+  // Rotas do Módulo Financeiro
+  CATEGORIAS_FINANCEIRAS: '/categorias-financeiras',
+  RECEITAS: '/receitas',
+  DESPESAS: '/despesas',
+  RELATORIOS_FINANCEIROS: '/relatorios-financeiros',
+
   // Rotas de configuração
   CONFIGURACOES: '/configuracoes',
   PERFIL: '/perfil',

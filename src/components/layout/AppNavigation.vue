@@ -64,6 +64,10 @@ import {
   ShoppingCartIcon,
   GiftIcon,
   ChartBarIcon,
+  FolderIcon,
+  BanknotesIcon,
+  ReceiptPercentIcon,
+  DocumentChartBarIcon,
 } from '@heroicons/vue/24/outline'
 import { XMarkIcon } from '@heroicons/vue/24/outline'
 import { APP_CONFIG, ROUTES } from '@/utils/constants'
@@ -98,6 +102,26 @@ const navigation = [
     name: 'Doações',
     href: ROUTES.DOACOES,
     icon: GiftIcon,
+  },
+  {
+    name: 'Categorias Financeiras',
+    href: ROUTES.CATEGORIAS_FINANCEIRAS,
+    icon: FolderIcon,
+  },
+  {
+    name: 'Receitas',
+    href: ROUTES.RECEITAS,
+    icon: BanknotesIcon,
+  },
+  {
+    name: 'Despesas',
+    href: ROUTES.DESPESAS,
+    icon: ReceiptPercentIcon,
+  },
+  {
+    name: 'Relatórios Financeiros',
+    href: ROUTES.RELATORIOS_FINANCEIROS,
+    icon: DocumentChartBarIcon,
   },
 ]
 </script>
