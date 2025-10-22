@@ -184,3 +184,185 @@ export interface ReceitasPorMetodoPagamento {
   totalDinheiro: number
   totalGeral: number
 }
+
+// ============================================
+// Módulo Financeiro - Tipos
+// ============================================
+
+// Enums
+export enum TipoCategoriaFinanceira {
+  RECEITA = 'RECEITA',
+  DESPESA = 'DESPESA'
+}
+
+export enum TipoReceita {
+  MENSALIDADE = 'MENSALIDADE',
+  DOACAO = 'DOACAO',
+  VENDA = 'VENDA',
+  OUTROS = 'OUTROS'
+}
+
+export enum TipoDespesa {
+  MANUTENCAO = 'MANUTENCAO',
+  SERVICOS = 'SERVICOS',
+  MATERIAIS = 'MATERIAIS',
+  SALARIOS = 'SALARIOS',
+  IMPOSTOS = 'IMPOSTOS',
+  OUTROS = 'OUTROS'
+}
+
+export enum StatusPagamentoDespesa {
+  PENDENTE = 'PENDENTE',
+  PAGO = 'PAGO',
+  CANCELADO = 'CANCELADO'
+}
+
+export enum MetodoPagamento {
+  PIX = 'PIX',
+  DINHEIRO = 'DINHEIRO',
+  TRANSFERENCIA = 'TRANSFERENCIA',
+  BOLETO = 'BOLETO',
+  CARTAO = 'CARTAO'
+}
+
+export enum FormaPagamento {
+  PIX = 'PIX',
+  DINHEIRO = 'DINHEIRO'
+}
+
+// Interfaces - Categoria Financeira
+export interface CategoriaFinanceira {
+  id?: string
+  nome: string
+  descricao?: string
+  tipo: TipoCategoriaFinanceira
+  cor?: string
+  ativa?: boolean
+  criadoEm?: string
+  atualizadoEm?: string
+}
+
+export interface CategoriaFinanceiraForm {
+  nome: string
+  descricao?: string
+  tipo: TipoCategoriaFinanceira
+  cor?: string
+}
+
+// Interfaces - Receita
+export interface Receita {
+  id?: string
+  descricao: string
+  valor: number
+  dataReceita: string  // ISO date string
+  dataRecebimento?: string  // ISO date string
+  tipoReceita: TipoReceita
+  categoriaId: string
+  categoriaNome?: string
+  associadoId?: string
+  associadoNome?: string
+  origemId?: string
+  metodoPagamento?: MetodoPagamento
+  codigoTransacao?: string
+  observacoes?: string
+  criadoEm?: string
+  atualizadoEm?: string
+}
+
+export interface ReceitaForm {
+  descricao: string
+  valor: number
+  dataReceita: string
+  dataRecebimento?: string
+  tipoReceita: TipoReceita
+  categoriaId: string
+  associadoId?: string
+  origemId?: string
+  metodoPagamento?: MetodoPagamento
+  codigoTransacao?: string
+  observacoes?: string
+}
+
+// Interfaces - Despesa
+export interface Despesa {
+  id?: string
+  descricao: string
+  valor: number
+  dataDespesa: string  // ISO date string
+  dataVencimento: string  // ISO date string
+  dataPagamento?: string  // ISO date string
+  tipoDespesa: TipoDespesa
+  statusPagamento: StatusPagamentoDespesa
+  categoriaId: string
+  categoriaNome?: string
+  formaPagamento?: FormaPagamento
+  fornecedor?: string
+  numeroDocumento?: string
+  codigoTransacao?: string
+  observacoes?: string
+  criadoEm?: string
+  atualizadoEm?: string
+}
+
+export interface DespesaForm {
+  descricao: string
+  valor: number
+  dataDespesa: string
+  dataVencimento: string
+  dataPagamento?: string
+  tipoDespesa: TipoDespesa
+  statusPagamento: StatusPagamentoDespesa
+  categoriaId: string
+  formaPagamento?: FormaPagamento
+  fornecedor?: string
+  numeroDocumento?: string
+  codigoTransacao?: string
+  observacoes?: string
+}
+
+// Interfaces - Relatórios Financeiros
+export interface ResumoFinanceiro {
+  periodoInicio: string
+  periodoFim: string
+  totalReceitas: number
+  totalDespesas: number
+  saldo: number
+  quantidadeReceitas: number
+  quantidadeDespesas: number
+}
+
+export interface ReceitaPorCategoria {
+  categoriaId: string
+  categoriaNome: string
+  categoriaCor?: string
+  total: number
+  quantidade: number
+  percentual: number
+}
+
+export interface DespesaPorCategoria {
+  categoriaId: string
+  categoriaNome: string
+  categoriaCor?: string
+  total: number
+  quantidade: number
+  percentual: number
+}
+
+export interface MovimentacaoMensal {
+  mes: number
+  ano: number
+  mesAno: string
+  totalReceitas: number
+  totalDespesas: number
+  saldo: number
+}
+
+export interface FluxoCaixa {
+  periodoInicio: string
+  periodoFim: string
+  totalReceitasPeriodo: number
+  totalDespesasPeriodo: number
+  saldoPeriodo: number
+  movimentacoes: MovimentacaoMensal[]
+}

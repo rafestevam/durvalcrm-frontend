@@ -9,6 +9,7 @@
       <input
         :id="inputId"
         :type="type"
+        :name="name"
         :value="modelValue"
         :placeholder="placeholder"
         :required="required"
@@ -41,6 +42,7 @@ interface Props {
   modelValue: string
   type?: string
   label?: string
+  name?: string
   placeholder?: string
   required?: boolean
   disabled?: boolean

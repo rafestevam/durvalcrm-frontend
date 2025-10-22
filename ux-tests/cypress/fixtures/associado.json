@@ -1,0 +1,19 @@
+{
+  "associadoTeste": {
+    "nomeCompleto": "João da Silva Teste Cypress",
+    "cpf": "123.456.789-00",
+    "email": "joao.silva.cypress@teste.com",
+    "telefone": "(11) 98765-4321"
+  },
+  "associadoMinimo": {
+    "nomeCompleto": "Maria Oliveira Teste",
+    "cpf": "987.654.321-00",
+    "email": "maria.oliveira@teste.com"
+  },
+  "associadoCompleto": {
+    "nomeCompleto": "Carlos Alberto Santos",
+    "cpf": "111.222.333-44",
+    "email": "carlos.santos@teste.com",
+    "telefone": "(21) 91234-5678"
+  }
+}

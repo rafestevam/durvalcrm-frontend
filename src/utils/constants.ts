@@ -20,9 +20,15 @@ export const ROUTES = {
   DOACOES: '/doacoes',
   
   PAINEL: '/painel',
-  
+
   RECONCILIACAO: '/reconciliacao',
-  
+
+  // Rotas do Módulo Financeiro
+  CATEGORIAS_FINANCEIRAS: '/categorias-financeiras',
+  RECEITAS: '/receitas',
+  DESPESAS: '/despesas',
+  RELATORIOS_FINANCEIROS: '/relatorios-financeiros',
+
   // Rotas de configuração
   CONFIGURACOES: '/configuracoes',
   PERFIL: '/perfil',
@@ -101,7 +107,7 @@ export const STORAGE_KEYS = {
 
 export const APP_CONFIG = {
   name: 'DurvalCRM',
-  version: '1.0.0',
+  version: '1.1.0',
   description: 'Sistema de gestão para associação',
   
   // Configurações de autenticação

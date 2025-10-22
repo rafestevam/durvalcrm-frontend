@@ -9,6 +9,7 @@
     <form @submit.prevent="handleSubmit" class="space-y-6">
       <BaseInput
         v-model="form.nomeCompleto"
+        name="nomeCompleto"
         label="Nome Completo"
         required
         :error="errors.nomeCompleto"
@@ -18,6 +19,7 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <BaseInput
           v-model="form.cpf"
+          name="cpf"
           label="CPF"
           placeholder="000.000.000-00"
           required
@@ -28,6 +30,7 @@
 
         <BaseInput
           v-model="form.telefone"
+          name="telefone"
           label="Telefone"
           placeholder="(00) 00000-0000"
           :error="errors.telefone"
@@ -38,6 +41,7 @@
 
       <BaseInput
         v-model="form.email"
+        name="email"
         type="email"
         label="E-mail"
         required
