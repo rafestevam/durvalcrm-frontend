@@ -1,0 +1,58 @@
+# Exemplo de workflow do GitHub Actions para Cypress
+# Para usar, copie este arquivo para .github/workflows/cypress.yml no repositório principal
+
+name: Cypress E2E Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  cypress-run:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        browser: [chrome, firefox, edge]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        working-directory: ux-tests
+        run: npm ci
+
+      - name: Run Cypress tests
+        uses: cypress-io/github-action@v5
+        with:
+          working-directory: ux-tests
+          browser: ${{ matrix.browser }}
+          # Se você tiver o backend rodando em outro serviço, configure aqui
+          # start: npm run dev
+          # wait-on: 'http://localhost:9080/crm'
+        env:
+          CYPRESS_BASE_URL: http://localhost:9080/crm
+          KEYCLOAK_USERNAME: tesouraria
+          KEYCLOAK_PASSWORD: ${{ secrets.KEYCLOAK_PASSWORD }}
+
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: cypress-screenshots-${{ matrix.browser }}
+          path: ux-tests/cypress/screenshots
+
+      - name: Upload videos
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: cypress-videos-${{ matrix.browser }}
+          path: ux-tests/cypress/videos

@@ -107,7 +107,7 @@ export const STORAGE_KEYS = {
 
 export const APP_CONFIG = {
   name: 'DurvalCRM',
-  version: '1.0.0',
+  version: '1.1.0',
   description: 'Sistema de gestão para associação',
   
   // Configurações de autenticação

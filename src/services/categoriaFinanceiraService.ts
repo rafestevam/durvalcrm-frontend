@@ -2,7 +2,7 @@ import apiService from './api'
 import type { CategoriaFinanceira, CategoriaFinanceiraForm, TipoCategoriaFinanceira } from './types'
 
 export class CategoriaFinanceiraService {
-  private readonly basePath = '/v1/categorias-financeiras'
+  private readonly basePath = '/categorias-financeiras'
 
   async findAll(): Promise<CategoriaFinanceira[]> {
     return apiService.get<CategoriaFinanceira[]>(this.basePath)

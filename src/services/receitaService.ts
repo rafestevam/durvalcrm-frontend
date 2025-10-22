@@ -2,7 +2,7 @@ import apiService from './api'
 import type { Receita, ReceitaForm, TipoReceita } from './types'
 
 export class ReceitaService {
-  private readonly basePath = '/v1/receitas'
+  private readonly basePath = '/receitas'
 
   async findAll(): Promise<Receita[]> {
     return apiService.get<Receita[]>(this.basePath)

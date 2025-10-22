@@ -2,7 +2,7 @@ import apiService from './api'
 import type { ResumoFinanceiro, ReceitaPorCategoria, DespesaPorCategoria, FluxoCaixa } from './types'
 
 export class RelatorioFinanceiroService {
-  private readonly basePath = '/v1/relatorios-financeiros'
+  private readonly basePath = '/relatorios-financeiros'
 
   async obterResumoFinanceiro(inicio: string, fim: string): Promise<ResumoFinanceiro> {
     return apiService.get<ResumoFinanceiro>(`${this.basePath}/resumo`, {

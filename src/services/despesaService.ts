@@ -2,7 +2,7 @@ import apiService from './api'
 import type { Despesa, DespesaForm, StatusPagamentoDespesa } from './types'
 
 export class DespesaService {
-  private readonly basePath = '/v1/despesas'
+  private readonly basePath = '/despesas'
 
   async findAll(): Promise<Despesa[]> {
     return apiService.get<Despesa[]>(this.basePath)
