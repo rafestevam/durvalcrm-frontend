@@ -53,6 +53,12 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: ROUTES.CONTAS_BANCARIAS,
+      name: 'ContasBancarias',
+      component: () => import('@/views/ContasBancariasView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
       path: '/:pathMatch(.*)*',
       name: 'NotFound',
       redirect: ROUTES.PAINEL,

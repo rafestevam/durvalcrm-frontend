@@ -18,9 +18,13 @@ export const ROUTES = {
   VENDAS: '/vendas',
   
   DOACOES: '/doacoes',
-  
+
   PAINEL: '/painel',
-  
+
+  FINANCEIRO: '/financeiro',
+  CONTAS_BANCARIAS: '/financeiro/contas',
+  RECEBIMENTOS: '/financeiro/recebimentos',
+
   RECONCILIACAO: '/reconciliacao',
   
   // Rotas de configuração

@@ -69,3 +69,6 @@ export const parsers = {
     return parseFloat(currency.replace(/[^\d,-]/g, '').replace(',', '.'))
   },
 }
+
+// Exportação direta para facilitar importação
+export const formatCurrency = formatters.currency

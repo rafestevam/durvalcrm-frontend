@@ -54,6 +54,7 @@ import {
   ShoppingCartIcon,
   GiftIcon,
   ChartBarIcon,
+  BanknotesIcon,
 } from '@heroicons/vue/24/outline'
 import { APP_CONFIG, ROUTES } from '@/utils/constants'
 
@@ -82,6 +83,11 @@ const navigation = [
     name: 'Doações',
     href: ROUTES.DOACOES,
     icon: GiftIcon,
+  },
+  {
+    name: 'Contas & Caixa',
+    href: ROUTES.CONTAS_BANCARIAS,
+    icon: BanknotesIcon,
   },
 ]
 </script>
