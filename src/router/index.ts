@@ -59,6 +59,18 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: ROUTES.DASHBOARD_FINANCEIRO,
+      name: 'DashboardFinanceiro',
+      component: () => import('@/views/DashboardFinanceiroView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: ROUTES.EXTRATO_CONTA,
+      name: 'ExtratoConta',
+      component: () => import('@/views/ExtratoContaView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
       path: '/:pathMatch(.*)*',
       name: 'NotFound',
       redirect: ROUTES.PAINEL,

@@ -24,6 +24,8 @@ export const ROUTES = {
   FINANCEIRO: '/financeiro',
   CONTAS_BANCARIAS: '/financeiro/contas',
   RECEBIMENTOS: '/financeiro/recebimentos',
+  DASHBOARD_FINANCEIRO: '/financeiro/dashboard',
+  EXTRATO_CONTA: '/financeiro/extrato/:id',
 
   RECONCILIACAO: '/reconciliacao',
   

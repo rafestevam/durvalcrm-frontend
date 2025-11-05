@@ -123,3 +123,82 @@ export const OrigemRecebimentoLabel: Record<OrigemRecebimento, string> = {
   [OrigemRecebimento.VENDA_CANTINA]: 'Venda de Cantina',
   [OrigemRecebimento.OUTROS]: 'Outros'
 }
+
+// Dashboard types (US-062)
+export interface SaldoContaDTO {
+  id: string
+  nome: string
+  finalidade: FinalidadeConta
+  saldoAtual: number
+  abaixoMinimo: boolean
+}
+
+export interface RecebimentoPorFormaPagamentoDTO {
+  formaPagamento: FormaPagamentoRecebimento
+  total: number
+  quantidade: number
+  percentual: number
+}
+
+export interface RecebimentoPorOrigemDTO {
+  origem: OrigemRecebimento
+  total: number
+  quantidade: number
+  percentual: number
+}
+
+export interface RecebimentosPeriodoDTO {
+  dataInicio: string
+  dataFim: string
+  totalPeriodo: number
+  porFormaPagamento: RecebimentoPorFormaPagamentoDTO[]
+  porOrigem: RecebimentoPorOrigemDTO[]
+}
+
+export interface DashboardFinanceiroDTO {
+  saldoTotalConsolidado: number
+  contasBancarias: SaldoContaDTO[]
+  caixasFisicos: SaldoContaDTO[]
+  recebimentosPeriodo: RecebimentosPeriodoDTO
+}
+
+// Statement types (US-064)
+export enum TipoMovimentacao {
+  ENTRADA = 'ENTRADA',
+  SAIDA = 'SAIDA',
+  TRANSFERENCIA_ENTRADA = 'TRANSFERENCIA_ENTRADA',
+  TRANSFERENCIA_SAIDA = 'TRANSFERENCIA_SAIDA'
+}
+
+export const TipoMovimentacaoLabel: Record<TipoMovimentacao, string> = {
+  [TipoMovimentacao.ENTRADA]: 'Entrada',
+  [TipoMovimentacao.SAIDA]: 'Saída',
+  [TipoMovimentacao.TRANSFERENCIA_ENTRADA]: 'Transferência (Entrada)',
+  [TipoMovimentacao.TRANSFERENCIA_SAIDA]: 'Transferência (Saída)'
+}
+
+export interface MovimentacaoExtratoDTO {
+  id: string
+  data: string
+  dataHora: string
+  tipo: TipoMovimentacao
+  formaPagamento?: FormaPagamentoRecebimento
+  origem?: OrigemRecebimento
+  descricao?: string
+  valor: number
+  saldoApos: number
+  vinculoId?: string
+  vinculoTipo?: string
+}
+
+export interface ExtratoContaDTO {
+  contaId: string
+  nomeConta: string
+  dataInicio: string
+  dataFim: string
+  saldoInicial: number
+  saldoFinal: number
+  totalEntradas: number
+  totalSaidas: number
+  movimentacoes: MovimentacaoExtratoDTO[]
+}

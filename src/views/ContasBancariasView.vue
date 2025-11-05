@@ -107,6 +107,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { BanknotesIcon } from '@heroicons/vue/24/outline'
 import { useContaBancariaStore } from '@/stores/contaBancaria'
 import AppLayout from '@/components/layout/AppLayout.vue'
@@ -118,6 +119,8 @@ import ContaBancariaFormModal from '@/components/financeiro/ContaBancariaFormMod
 import RecebimentoFormModal from '@/components/financeiro/RecebimentoFormModal.vue'
 import { formatCurrency } from '@/utils/formatters'
 import type { ContaBancaria } from '@/types/financeiro'
+
+const router = useRouter()
 
 const contaBancariaStore = useContaBancariaStore()
 
@@ -168,8 +171,7 @@ async function confirmInativar(conta: ContaBancaria) {
 }
 
 function verExtrato(conta: ContaBancaria) {
-  // TODO: Navigate to extrato view
-  alert(`Funcionalidade de extrato será implementada na US-064\nConta: ${conta.nome}`)
+  router.push(`/financeiro/extrato/${conta.id}`)
 }
 
 async function onContaSaved() {

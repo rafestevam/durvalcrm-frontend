@@ -55,6 +55,7 @@ import {
   GiftIcon,
   ChartBarIcon,
   BanknotesIcon,
+  PresentationChartLineIcon,
 } from '@heroicons/vue/24/outline'
 import { APP_CONFIG, ROUTES } from '@/utils/constants'
 
@@ -88,6 +89,11 @@ const navigation = [
     name: 'Contas & Caixa',
     href: ROUTES.CONTAS_BANCARIAS,
     icon: BanknotesIcon,
+  },
+  {
+    name: 'Dashboard Financeiro',
+    href: ROUTES.DASHBOARD_FINANCEIRO,
+    icon: PresentationChartLineIcon,
   },
 ]
 </script>
