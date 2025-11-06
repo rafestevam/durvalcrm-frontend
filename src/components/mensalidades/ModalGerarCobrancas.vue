@@ -46,22 +46,25 @@
 
     <template #footer>
       <div class="flex justify-end space-x-3">
-        <BaseButton
-          variant="secondary"
+        <button
+          id="mensalidades-modal-gerar-cancelar"
+          type="button"
+          class="btn btn-outline px-4 py-2 text-sm"
           @click="$emit('close')"
           :disabled="loading"
-          data-testid="modal-gerar-cobrancas-cancelar-button"
         >
           Cancelar
-        </BaseButton>
-        <BaseButton
-          variant="primary"
+        </button>
+        <button
+          id="mensalidades-modal-gerar-confirmar"
+          type="button"
+          class="btn btn-primary px-4 py-2 text-sm"
           @click="confirmarGeracao"
-          :loading="loading"
-          data-testid="modal-gerar-cobrancas-confirmar-button"
+          :disabled="loading"
         >
-          Gerar Cobranças
-        </BaseButton>
+          <span v-if="loading">Gerando...</span>
+          <span v-else>Gerar Cobranças</span>
+        </button>
       </div>
     </template>
   </BaseModal>
@@ -71,7 +74,6 @@
 import { computed } from 'vue'
 import { ExclamationTriangleIcon } from '@heroicons/vue/24/outline'
 import BaseModal from '@/components/common/BaseModal.vue'
-import BaseButton from '@/components/common/BaseButton.vue'
 import { formatters } from '@/utils/formatters'
 import type { ResumoMensalidades } from '@/services/types'
 

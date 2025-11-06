@@ -1,19 +1,19 @@
 <template>
   <div class="flex items-center space-x-4">
     <button
+      id="mensalidades-periodo-anterior"
       @click="$emit('periodoAnterior')"
       class="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
-      data-testid="seletor-periodo-anterior-button"
     >
       <ChevronLeftIcon class="h-5 w-5" />
     </button>
 
     <div class="flex items-center space-x-2">
       <select
+        id="mensalidades-periodo-mes"
         :value="mes"
         @change="onMesChange"
         class="rounded-md border-gray-300 text-sm focus:border-blue-500 focus:ring-blue-500"
-        data-testid="seletor-periodo-mes-select"
       >
         <option v-for="(nome, index) in meses" :key="index" :value="index + 1">
           {{ nome }}
@@ -21,10 +21,10 @@
       </select>
 
       <select
+        id="mensalidades-periodo-ano"
         :value="ano"
         @change="onAnoChange"
         class="rounded-md border-gray-300 text-sm focus:border-blue-500 focus:ring-blue-500"
-        data-testid="seletor-periodo-ano-select"
       >
         <option v-for="anoOpcao in anosDisponiveis" :key="anoOpcao" :value="anoOpcao">
           {{ anoOpcao }}
@@ -33,9 +33,9 @@
     </div>
 
     <button
+      id="mensalidades-periodo-proximo"
       @click="$emit('proximoPeriodo')"
       class="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
-      data-testid="seletor-periodo-proximo-button"
     >
       <ChevronRightIcon class="h-5 w-5" />
     </button>

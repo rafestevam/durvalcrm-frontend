@@ -20,17 +20,17 @@
             @periodo-anterior="mensalidadesStore.periodoAnterior"
             @proximo-periodo="mensalidadesStore.proximoPeriodo"
           />
-          
-          <BaseButton
-            variant="primary"
+
+          <button
+            id="mensalidades-gerar-cobrancas"
+            type="button"
+            class="btn btn-primary inline-flex items-center"
             @click="showGerarModal = true"
             :disabled="mensalidadesStore.loading"
-            data-testid="mensalidades-gerar-cobrancas-button"
           >
-          <!--  :disabled="mensalidadesStore.loading" -->
             <PlusIcon class="h-4 w-4 mr-2" />
             Gerar Cobranças
-          </BaseButton>
+          </button>
         </div>
       </div>
     </template>
@@ -143,7 +143,6 @@ import {
 } from '@heroicons/vue/24/outline'
 
 import AppLayout from '@/components/layout/AppLayout.vue'
-import BaseButton from '@/components/common/BaseButton.vue'
 import AlertMessage from '@/components/common/AlertMessage.vue'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 

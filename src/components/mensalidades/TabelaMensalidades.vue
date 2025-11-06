@@ -57,18 +57,20 @@
           
           <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
             <button
+              :id="`mensalidade-ver-qrcode-${mensalidade.id}`"
+              type="button"
               @click="handleVerQRCode(mensalidade)"
               class="text-blue-600 hover:text-blue-900"
-              :data-testid="`mensalidade-ver-qrcode-${mensalidade.id}-button`"
             >
               Ver QR Code
             </button>
 
             <button
               v-if="mensalidade.status !== 'PAGA'"
+              :id="`mensalidade-marcar-paga-${mensalidade.id}`"
+              type="button"
               @click="$emit('marcar-paga', mensalidade)"
               class="text-green-600 hover:text-green-900 ml-3"
-              :data-testid="`mensalidade-marcar-paga-${mensalidade.id}-button`"
             >
               Marcar como Paga
             </button>
