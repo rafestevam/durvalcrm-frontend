@@ -20,6 +20,7 @@
                   ? 'bg-blue-100 text-blue-700'
                   : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
               ]"
+              :data-testid="`nav-${item.name.toLowerCase().replace(/\s+/g, '-')}-link`"
             >
               <component
                 :is="item.icon"

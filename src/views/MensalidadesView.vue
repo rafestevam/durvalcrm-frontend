@@ -25,6 +25,7 @@
             variant="primary"
             @click="showGerarModal = true"
             :disabled="mensalidadesStore.loading"
+            data-testid="mensalidades-gerar-cobrancas-button"
           >
           <!--  :disabled="mensalidadesStore.loading" -->
             <PlusIcon class="h-4 w-4 mr-2" />

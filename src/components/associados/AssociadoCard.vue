@@ -14,7 +14,7 @@
             <span v-if="associado.telefone">{{ associado.telefone }}</span>
           </div>
         </div>
-        
+
         <div class="flex space-x-2">
           <BaseButton
             variant="outline"

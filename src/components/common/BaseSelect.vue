@@ -14,6 +14,7 @@
         'border-red-300 text-red-900 placeholder-red-300 focus:border-red-500 focus:ring-red-500': error,
         'bg-gray-50 cursor-not-allowed': disabled
       }"
+      :data-testid="dataTestid"
       @change="handleChange"
       @blur="$emit('blur', $event)"
     >
@@ -32,6 +33,7 @@ interface Props {
   required?: boolean
   disabled?: boolean
   error?: string
+  dataTestid?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {

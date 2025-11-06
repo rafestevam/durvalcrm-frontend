@@ -10,10 +10,10 @@
           </p>
         </div>
         <div class="mt-4 sm:mt-0 flex gap-3">
-          <BaseButton variant="outline" @click="openRecebimentoModal">
+          <BaseButton variant="outline" @click="openRecebimentoModal" data-testid="conta-registrar-recebimento-button">
             + Registrar Recebimento
           </BaseButton>
-          <BaseButton variant="primary" @click="openCreateModal">
+          <BaseButton variant="primary" @click="openCreateModal" data-testid="conta-nova-button">
             + Nova Conta
           </BaseButton>
         </div>
@@ -42,6 +42,7 @@
             v-model="filtroStatus"
             label="Status"
             @change="onFiltroChange"
+            data-testid="conta-filtro-status-select"
           >
             <option value="">Todas</option>
             <option value="ATIVA">Ativas</option>
@@ -52,6 +53,7 @@
             v-model="filtroTipo"
             label="Tipo"
             @change="onFiltroChange"
+            data-testid="conta-filtro-tipo-select"
           >
             <option value="">Todos</option>
             <option value="BANCARIA">Contas Bancárias</option>

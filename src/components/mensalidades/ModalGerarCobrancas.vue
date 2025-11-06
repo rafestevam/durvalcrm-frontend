@@ -46,17 +46,19 @@
 
     <template #footer>
       <div class="flex justify-end space-x-3">
-        <BaseButton 
-          variant="secondary" 
+        <BaseButton
+          variant="secondary"
           @click="$emit('close')"
           :disabled="loading"
+          data-testid="modal-gerar-cobrancas-cancelar-button"
         >
           Cancelar
         </BaseButton>
-        <BaseButton 
-          variant="primary" 
+        <BaseButton
+          variant="primary"
           @click="confirmarGeracao"
           :loading="loading"
+          data-testid="modal-gerar-cobrancas-confirmar-button"
         >
           Gerar Cobranças
         </BaseButton>

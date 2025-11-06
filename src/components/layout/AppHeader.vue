@@ -8,6 +8,7 @@
             type="button"
             class="lg:hidden -ml-0.5 -mt-0.5 h-12 w-12 inline-flex items-center justify-center rounded-md text-gray-500 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
             @click="toggleMobileMenu"
+            data-testid="header-mobile-menu-button"
           >
             <span class="sr-only">Abrir menu</span>
             <Bars3Icon class="h-6 w-6" aria-hidden="true" />
@@ -32,6 +33,7 @@
               type="button"
               class="flex max-w-xs items-center rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
               @click="toggleUserMenu"
+              data-testid="header-user-menu-button"
             >
               <span class="sr-only">Abrir menu do usuário</span>
               <UserCircleIcon class="h-8 w-8 text-gray-400" />
@@ -53,6 +55,7 @@
                   type="button"
                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
                   @click="logout"
+                  data-testid="header-logout-button"
                 >
                   Sair
                 </button>

@@ -78,7 +78,18 @@ export interface Venda {
   descricao: string
   valor: number
   origem: 'CANTINA' | 'BAZAR' | 'LIVROS'
-  formaPagamento: 'PIX' | 'DINHEIRO'
+  formaPagamento: 'PIX' | 'CARTAO_CREDITO' | 'CARTAO_DEBITO' | 'DINHEIRO'
+  /**
+   * ID da conta bancária onde o pagamento foi/será lançado.
+   * Opcional no frontend - se não fornecido, backend seleciona automaticamente.
+   * US-067: Integração Automática de Vendas com Contas Bancárias
+   */
+  contaBancariaId?: string
+  /**
+   * ID do recebimento vinculado a esta venda (preenchido pelo backend).
+   * US-067: Integração Automática de Vendas com Contas Bancárias
+   */
+  recebimentoId?: string
   dataVenda: string
   criadoEm: string
   atualizadoEm?: string

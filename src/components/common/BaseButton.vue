@@ -3,6 +3,7 @@
     :type="type"
     :disabled="disabled || loading"
     :class="buttonClasses"
+    :data-testid="dataTestid"
     @click="$emit('click', $event)"
   >
     <LoadingSpinner v-if="loading" class="w-4 h-4 mr-2" />
@@ -21,6 +22,7 @@ interface Props {
   disabled?: boolean
   loading?: boolean
   fullWidth?: boolean
+  dataTestid?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {

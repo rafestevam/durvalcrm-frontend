@@ -10,18 +10,26 @@
           </p>
         </div>
         <div class="mt-4 sm:mt-0">
-          <BaseButton variant="primary" @click="openCreateModal">
+          <button
+            id="associado-adicionar"
+            type="button"
+            class="btn btn-primary"
+            @click="openCreateModal"
+          >
             + Adicionar Associado
-          </BaseButton>
+          </button>
         </div>
       </div>
 
       <!-- Busca -->
       <div class="bg-white shadow rounded-lg">
         <div class="p-6">
-          <BaseInput
+          <input
+            id="associado-buscar"
             v-model="searchQuery"
+            type="text"
             placeholder="Buscar por nome ou CPF..."
+            class="form-input w-full"
             @input="onSearch"
           />
         </div>
@@ -58,20 +66,22 @@
                 <td>{{ associado.telefone || '-' }}</td>
                 <td>
                   <div class="flex space-x-2">
-                    <BaseButton
-                      variant="outline"
-                      size="sm"
+                    <button
+                      :id="`associado-editar-${associado.id}`"
+                      type="button"
+                      class="btn btn-outline text-sm px-3 py-1"
                       @click="openEditModal(associado)"
                     >
                       Editar
-                    </BaseButton>
-                    <BaseButton
-                      variant="danger"
-                      size="sm"
+                    </button>
+                    <button
+                      :id="`associado-excluir-${associado.id}`"
+                      type="button"
+                      class="btn btn-danger text-sm px-3 py-1"
                       @click="confirmDelete(associado)"
                     >
                       Excluir
-                    </BaseButton>
+                    </button>
                   </div>
                 </td>
               </tr>
@@ -95,8 +105,6 @@ import { ref, onMounted } from 'vue'
 import { UsersIcon } from '@heroicons/vue/24/outline'
 import { useAssociadosStore } from '@/stores/associados'
 import AppLayout from '@/components/layout/AppLayout.vue'
-import BaseButton from '@/components/common/BaseButton.vue'
-import BaseInput from '@/components/common/BaseInput.vue'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 import AssociadoFormModal from '@/components/associados/AssociadoFormModal.vue'
 import type { Associado } from '@/services/types'

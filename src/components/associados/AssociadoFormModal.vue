@@ -6,62 +6,99 @@
     @close="close"
     @update:show="$emit('update:show', $event)"
   >
-    <form @submit.prevent="handleSubmit" class="space-y-6">
-      <BaseInput
-        v-model="form.nomeCompleto"
-        label="Nome Completo"
-        required
-        :error="errors.nomeCompleto"
-        @blur="validateField('nomeCompleto')"
-      />
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <BaseInput
-          v-model="form.cpf"
-          label="CPF"
-          placeholder="000.000.000-00"
+    <form @submit.prevent="handleSubmit" class="space-y-6" id="associado-form">
+      <div>
+        <label for="associado-nome-completo" class="form-label">
+          Nome Completo
+          <span class="text-danger-500 ml-1">*</span>
+        </label>
+        <input
+          id="associado-nome-completo"
+          v-model="form.nomeCompleto"
+          type="text"
           required
-          :error="errors.cpf"
-          @input="onCpfInput"
-          @blur="validateField('cpf')"
+          class="form-input"
+          :class="{ 'border-danger-300': errors.nomeCompleto }"
+          @blur="validateField('nomeCompleto')"
         />
-
-        <BaseInput
-          v-model="form.telefone"
-          label="Telefone"
-          placeholder="(00) 00000-0000"
-          :error="errors.telefone"
-          @input="onTelefoneInput"
-          @blur="validateField('telefone')"
-        />
+        <p v-if="errors.nomeCompleto" class="form-error">{{ errors.nomeCompleto }}</p>
       </div>
 
-      <BaseInput
-        v-model="form.email"
-        type="email"
-        label="E-mail"
-        required
-        :error="errors.email"
-        @blur="validateField('email')"
-      />
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label for="associado-cpf" class="form-label">
+            CPF
+            <span class="text-danger-500 ml-1">*</span>
+          </label>
+          <input
+            id="associado-cpf"
+            v-model="form.cpf"
+            type="text"
+            placeholder="000.000.000-00"
+            required
+            class="form-input"
+            :class="{ 'border-danger-300': errors.cpf }"
+            @input="onCpfInput"
+            @blur="validateField('cpf')"
+          />
+          <p v-if="errors.cpf" class="form-error">{{ errors.cpf }}</p>
+        </div>
+
+        <div>
+          <label for="associado-telefone" class="form-label">Telefone</label>
+          <input
+            id="associado-telefone"
+            v-model="form.telefone"
+            type="text"
+            placeholder="(00) 00000-0000"
+            class="form-input"
+            :class="{ 'border-danger-300': errors.telefone }"
+            @input="onTelefoneInput"
+            @blur="validateField('telefone')"
+          />
+          <p v-if="errors.telefone" class="form-error">{{ errors.telefone }}</p>
+        </div>
+      </div>
+
+      <div>
+        <label for="associado-email" class="form-label">
+          E-mail
+          <span class="text-danger-500 ml-1">*</span>
+        </label>
+        <input
+          id="associado-email"
+          v-model="form.email"
+          type="email"
+          required
+          class="form-input"
+          :class="{ 'border-danger-300': errors.email }"
+          @blur="validateField('email')"
+        />
+        <p v-if="errors.email" class="form-error">{{ errors.email }}</p>
+      </div>
     </form>
 
     <template #footer>
       <div class="flex space-x-3">
-        <BaseButton
-          variant="outline"
+        <button
+          id="associado-form-cancelar"
+          type="button"
+          class="btn btn-outline px-4 py-2 text-sm"
           @click="close"
         >
           Cancelar
-        </BaseButton>
-        
-        <BaseButton
-          variant="primary"
-          :loading="isSubmitting"
+        </button>
+
+        <button
+          id="associado-form-salvar"
+          type="button"
+          class="btn btn-primary px-4 py-2 text-sm"
+          :disabled="isSubmitting"
           @click="handleSubmit"
         >
-          {{ isEditing ? 'Atualizar' : 'Salvar' }}
-        </BaseButton>
+          <span v-if="isSubmitting">Salvando...</span>
+          <span v-else>{{ isEditing ? 'Atualizar' : 'Salvar' }}</span>
+        </button>
       </div>
     </template>
   </BaseModal>
@@ -71,8 +108,6 @@
 import { ref, reactive, computed, watch } from 'vue'
 import { useAssociadosStore } from '@/stores/associados'
 import BaseModal from '@/components/common/BaseModal.vue'
-import BaseButton from '@/components/common/BaseButton.vue'
-import BaseInput from '@/components/common/BaseInput.vue'
 import { validators, validationMessages } from '@/utils/validators'
 import { formatters } from '@/utils/formatters'
 import type { Associado } from '@/services/types'

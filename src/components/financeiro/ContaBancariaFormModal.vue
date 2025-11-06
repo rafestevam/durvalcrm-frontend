@@ -15,6 +15,7 @@
         required
         :error="errors.nome"
         @blur="validateField('nome')"
+        data-testid="conta-form-nome-input"
       />
 
       <!-- Tipo e Finalidade -->
@@ -25,6 +26,7 @@
           required
           :error="errors.tipo"
           @change="onTipoChange"
+          data-testid="conta-form-tipo-select"
         >
           <option value="">Selecione...</option>
           <option v-for="(label, value) in TipoContaLabel" :key="value" :value="value">
@@ -37,6 +39,7 @@
           label="Finalidade"
           required
           :error="errors.finalidade"
+          data-testid="conta-form-finalidade-select"
         >
           <option value="">Selecione...</option>
           <option v-for="(label, value) in FinalidadeContaLabel" :key="value" :value="value">
@@ -52,6 +55,7 @@
           label="Banco"
           placeholder="Ex: Banco do Brasil, Caixa Econômica"
           :error="errors.banco"
+          data-testid="conta-form-banco-input"
         />
 
         <div class="grid grid-cols-2 gap-4">
@@ -60,6 +64,7 @@
             label="Agência"
             placeholder="Ex: 1234-5"
             :error="errors.agencia"
+            data-testid="conta-form-agencia-input"
           />
 
           <BaseInput
@@ -67,6 +72,7 @@
             label="Número da Conta"
             placeholder="Ex: 56789-0"
             :error="errors.numeroConta"
+            data-testid="conta-form-numero-conta-input"
           />
         </div>
       </div>
@@ -83,6 +89,7 @@
           required
           :error="errors.saldoInicial"
           @blur="validateField('saldoInicial')"
+          data-testid="conta-form-saldo-inicial-input"
         />
 
         <BaseInput
@@ -92,6 +99,7 @@
           required
           :error="errors.dataSaldoInicial"
           @blur="validateField('dataSaldoInicial')"
+          data-testid="conta-form-data-saldo-inicial-input"
         />
       </div>
 
@@ -108,6 +116,7 @@
         <BaseButton
           variant="outline"
           @click="close"
+          data-testid="conta-form-cancelar-button"
         >
           Cancelar
         </BaseButton>
@@ -116,6 +125,7 @@
           variant="primary"
           :loading="isSubmitting"
           @click="handleSubmit"
+          data-testid="conta-form-salvar-button"
         >
           {{ isEditing ? 'Atualizar' : 'Salvar' }}
         </BaseButton>

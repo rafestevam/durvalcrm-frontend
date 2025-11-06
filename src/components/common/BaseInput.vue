@@ -14,6 +14,7 @@
         :required="required"
         :disabled="disabled"
         :class="inputClasses"
+        :data-testid="dataTestid"
         @input="onInput"
         @blur="onBlur"
         @focus="onFocus"
@@ -47,6 +48,7 @@ interface Props {
   error?: string
   hint?: string
   validator?: (value: string) => string | null
+  dataTestid?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {

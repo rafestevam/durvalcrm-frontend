@@ -45,6 +45,7 @@
                     v-if="showCloseButton"
                     type="button"
                     class="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                    data-testid="modal-close-button"
                     @click="close"
                   >
                     <span class="sr-only">Fechar</span>

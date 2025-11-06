@@ -202,6 +202,22 @@ export const VENDA_ORIGENS = [
   { value: 'LIVROS', label: 'Livros' },
 ] as const
 
+// US-067: Formas de Pagamento para Vendas
+export const FORMAS_PAGAMENTO_VENDA = [
+  { value: 'PIX', label: 'PIX', icon: '📱' },
+  { value: 'CARTAO_CREDITO', label: 'Cartão de Crédito', icon: '💳' },
+  { value: 'CARTAO_DEBITO', label: 'Cartão de Débito', icon: '💳' },
+  { value: 'DINHEIRO', label: 'Dinheiro', icon: '💵' },
+] as const
+
+// Mapeamento de FormaPagamento para FinalidadeConta
+export const FORMA_PAGAMENTO_TO_FINALIDADE = {
+  'PIX': 'PIX',
+  'CARTAO_CREDITO': 'CARTAO_CREDITO',
+  'CARTAO_DEBITO': 'CARTAO_DEBITO',
+  'DINHEIRO': 'DINHEIRO_DEPOSITOS',
+} as const
+
 // Constantes para Reconciliação
 export const PAGAMENTO_METODOS = [
   { value: 'PIX', label: 'PIX' },

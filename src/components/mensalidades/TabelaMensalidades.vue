@@ -59,14 +59,16 @@
             <button
               @click="handleVerQRCode(mensalidade)"
               class="text-blue-600 hover:text-blue-900"
+              :data-testid="`mensalidade-ver-qrcode-${mensalidade.id}-button`"
             >
               Ver QR Code
             </button>
-            
+
             <button
               v-if="mensalidade.status !== 'PAGA'"
               @click="$emit('marcar-paga', mensalidade)"
               class="text-green-600 hover:text-green-900 ml-3"
+              :data-testid="`mensalidade-marcar-paga-${mensalidade.id}-button`"
             >
               Marcar como Paga
             </button>

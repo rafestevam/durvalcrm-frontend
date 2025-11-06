@@ -57,6 +57,40 @@ class ContaBancariaService {
   }
 
   /**
+   * Get active accounts by finalidade (purpose)
+   * US-067: Used to find accounts for automatic integration with sales
+   */
+  async findByFinalidade(finalidade: string): Promise<ContaBancaria[]> {
+    const response = await api.get<ContaBancaria[]>(this.endpoint, {
+      params: {
+        finalidade,
+        status: 'ATIVA'
+      }
+    })
+    return this.normalizeContasList(response as any as ContaBancaria[])
+  }
+
+  /**
+   * Get active accounts grouped by finalidade
+   * US-067: Used to display available accounts by payment method
+   */
+  async getContasAtivasPorFinalidade(): Promise<Record<string, ContaBancaria[]>> {
+    const contas = await this.findByStatus('ATIVA' as StatusConta)
+
+    const grouped: Record<string, ContaBancaria[]> = {}
+
+    contas.forEach(conta => {
+      const finalidade = conta.finalidade
+      if (!grouped[finalidade]) {
+        grouped[finalidade] = []
+      }
+      grouped[finalidade].push(conta)
+    })
+
+    return grouped
+  }
+
+  /**
    * Normalize date field from backend format [year, month, day] to ISO string
    */
   private normalizeConta(conta: ContaBancaria): ContaBancaria {
