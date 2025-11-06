@@ -15,29 +15,39 @@
           <form @submit.prevent="registrarVenda" class="space-y-6">
             <!-- Descrição -->
             <div>
-              <BaseInput
+              <label for="venda-descricao" class="form-label">
+                Descrição da Venda
+                <span class="text-danger-500 ml-1">*</span>
+              </label>
+              <input
                 id="venda-descricao"
                 v-model="forma.descricao"
                 type="text"
-                label="Descrição da Venda"
                 placeholder="Ex: Lanche, Livro de História, etc."
                 required
-                :error="errors.descricao"
+                class="form-input"
+                :class="errors.descricao ? 'border-danger-300 focus:border-danger-500 focus:ring-danger-500' : ''"
               />
+              <p v-if="errors.descricao" class="form-error">{{ errors.descricao }}</p>
             </div>
 
             <!-- Valor -->
             <div>
-              <BaseInput
+              <label for="venda-valor" class="form-label">
+                Valor da Venda (R$)
+                <span class="text-danger-500 ml-1">*</span>
+              </label>
+              <input
                 id="venda-valor"
                 v-model="forma.valor"
                 type="number"
                 step="0.01"
-                label="Valor da Venda (R$)"
                 placeholder="15,00"
                 required
-                :error="errors.valor"
+                class="form-input"
+                :class="errors.valor ? 'border-danger-300 focus:border-danger-500 focus:ring-danger-500' : ''"
               />
+              <p v-if="errors.valor" class="form-error">{{ errors.valor }}</p>
             </div>
 
 
@@ -213,7 +223,6 @@
 import { ref, reactive, onMounted, computed, watch } from 'vue'
 import { ShoppingCartIcon } from '@heroicons/vue/24/outline'
 import AppLayout from '@/components/layout/AppLayout.vue'
-import BaseInput from '@/components/common/BaseInput.vue'
 import AlertMessage from '@/components/common/AlertMessage.vue'
 import { formatters } from '@/utils/formatters'
 import { VENDA_ORIGENS, FORMAS_PAGAMENTO_VENDA, FORMA_PAGAMENTO_TO_FINALIDADE } from '@/utils/constants'
@@ -330,17 +339,16 @@ function validateForm(): boolean {
     isValid = false
   }
 
-  // US-067: Validar se há conta disponível (mesmo que seja seleção automática)
-  if (contasDisponiveis.value.length === 0 && !forma.contaBancariaId) {
-    errors.contaBancaria = 'Configure uma conta bancária para esta forma de pagamento'
-    isValid = false
-  }
+  // US-067: Conta bancária é opcional - apenas mostrar aviso visual, não bloquear submissão
+  // A validação foi removida para permitir vendas sem conta bancária configurada
 
   return isValid
 }
 
 async function registrarVenda() {
-  if (!validateForm()) return
+  if (!validateForm()) {
+    return
+  }
 
   try {
     isSubmitting.value = true
