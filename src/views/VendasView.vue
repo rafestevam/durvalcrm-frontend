@@ -16,19 +16,20 @@
             <!-- Descrição -->
             <div>
               <BaseInput
+                id="venda-descricao"
                 v-model="forma.descricao"
                 type="text"
                 label="Descrição da Venda"
                 placeholder="Ex: Lanche, Livro de História, etc."
                 required
                 :error="errors.descricao"
-                data-testid="venda-descricao-input"
               />
             </div>
 
             <!-- Valor -->
             <div>
               <BaseInput
+                id="venda-valor"
                 v-model="forma.valor"
                 type="number"
                 step="0.01"
@@ -36,7 +37,6 @@
                 placeholder="15,00"
                 required
                 :error="errors.valor"
-                data-testid="venda-valor-input"
               />
             </div>
 
@@ -48,6 +48,7 @@
                 <button
                   v-for="origem in VENDA_ORIGENS"
                   :key="origem.value"
+                  :id="`venda-origem-${origem.value.toLowerCase()}`"
                   type="button"
                   class="flex items-center justify-center px-6 py-4 border-2 rounded-lg text-lg font-medium transition-colors"
                   :class="[
@@ -55,7 +56,6 @@
                       ? 'border-primary-500 bg-primary-50 text-primary-700'
                       : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
                   ]"
-                  :data-testid="`venda-origem-${origem.value.toLowerCase()}-button`"
                   @click="forma.origem = origem.value"
                 >
                   {{ origem.label }}
@@ -72,6 +72,7 @@
                 <button
                   v-for="forma_pag in FORMAS_PAGAMENTO_VENDA"
                   :key="forma_pag.value"
+                  :id="`venda-forma-pagamento-${forma_pag.value.toLowerCase().replace(/_/g, '-')}`"
                   type="button"
                   class="flex flex-col items-center justify-center px-4 py-3 border-2 rounded-lg font-medium transition-colors"
                   :class="[
@@ -79,7 +80,6 @@
                       ? 'border-primary-500 bg-primary-50 text-primary-700'
                       : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
                   ]"
-                  :data-testid="`venda-forma-pagamento-${forma_pag.value.toLowerCase().replace(/_/g, '-')}-button`"
                   @click="forma.formaPagamento = forma_pag.value"
                 >
                   <span class="text-2xl mb-1">{{ forma_pag.icon }}</span>
@@ -96,9 +96,9 @@
                 <span class="text-sm font-normal text-gray-500">(opcional)</span>
               </label>
               <select
+                id="venda-conta-bancaria"
                 v-model="forma.contaBancariaId"
                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-                data-testid="venda-conta-bancaria-select"
               >
                 <option value="">Seleção automática</option>
                 <option
@@ -141,16 +141,15 @@
 
             <!-- Botão -->
             <div>
-              <BaseButton
+              <button
+                id="venda-registrar"
                 type="submit"
-                variant="success"
-                size="lg"
-                :loading="isSubmitting"
-                :full-width="true"
-                data-testid="venda-submit-button"
+                :disabled="isSubmitting"
+                class="w-full px-6 py-3 bg-success-600 text-white rounded-lg text-lg font-semibold hover:bg-success-700 focus:outline-none focus:ring-2 focus:ring-success-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                REGISTRAR VENDA
-              </BaseButton>
+                <span v-if="isSubmitting">Registrando...</span>
+                <span v-else>REGISTRAR VENDA</span>
+              </button>
             </div>
           </form>
         </div>
@@ -214,7 +213,6 @@
 import { ref, reactive, onMounted, computed, watch } from 'vue'
 import { ShoppingCartIcon } from '@heroicons/vue/24/outline'
 import AppLayout from '@/components/layout/AppLayout.vue'
-import BaseButton from '@/components/common/BaseButton.vue'
 import BaseInput from '@/components/common/BaseInput.vue'
 import AlertMessage from '@/components/common/AlertMessage.vue'
 import { formatters } from '@/utils/formatters'
