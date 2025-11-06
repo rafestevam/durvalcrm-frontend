@@ -5,7 +5,7 @@
         Associado <span class="text-sm text-gray-500">(opcional - para doações identificadas)</span>
       </label>
       <select
-        id="associado"
+        id="doacao-associado"
         v-model="formData.associadoId"
         :disabled="isEdit"
         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
@@ -31,11 +31,11 @@
           <span class="text-gray-500 sm:text-sm">R$</span>
         </div>
         <input
-          id="valor"
+          id="doacao-valor"
           v-model.number="formData.valor"
           type="number"
           step="0.01"
-          min="0"
+          min="0.01"
           class="pl-12 focus:ring-blue-500 focus:border-blue-500 block w-full pr-12 sm:text-sm border-gray-300 rounded-md"
           placeholder="0,00"
           required
@@ -49,7 +49,7 @@
         Tipo de Doação
       </label>
       <select
-        id="tipo"
+        id="doacao-tipo"
         v-model="formData.tipo"
         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
         required
@@ -66,7 +66,7 @@
         Data da Doação
       </label>
       <input
-        id="dataDoacao"
+        id="doacao-data"
         v-model="formData.dataDoacao"
         type="datetime-local"
         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
@@ -79,7 +79,7 @@
         Descrição (opcional)
       </label>
       <textarea
-        id="descricao"
+        id="doacao-descricao"
         v-model="formData.descricao"
         rows="3"
         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
@@ -90,6 +90,7 @@
 
     <div class="flex justify-end space-x-3">
       <button
+        id="doacao-cancelar"
         type="button"
         @click="$emit('cancelar')"
         class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
@@ -98,6 +99,7 @@
         Cancelar
       </button>
       <button
+        id="doacao-salvar"
         type="submit"
         :disabled="loading"
         class="inline-flex justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -138,7 +140,7 @@ const associados = computed(() => associadosStore.associados)
 const formData = ref<DoacaoFormData>({
   associadoId: '',
   valor: 0,
-  tipo: 'UNICA' as TipoDoacao,
+  tipo: '' as TipoDoacao,
   descricao: '',
   dataDoacao: new Date().toISOString().slice(0, 16)
 })

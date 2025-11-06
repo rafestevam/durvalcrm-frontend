@@ -96,6 +96,7 @@
     <div class="bg-gray-50 px-4 py-4 sm:px-6">
       <div class="flex justify-end space-x-3">
         <button
+          id="doacao-gerar-pix"
           v-if="doacao.status === 'PENDENTE'"
           @click="mostrarModalPix = true"
           class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
@@ -105,24 +106,27 @@
           </svg>
           Gerar PIX
         </button>
-        
+
         <button
+          id="doacao-confirmar-pagamento"
           v-if="podeConfirmar"
           @click="mostrarModalConfirmacao = true"
           class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
         >
           Confirmar Pagamento
         </button>
-        
+
         <button
+          id="doacao-cancelar-doacao"
           v-if="podeCancelar"
           @click="$emit('cancelar')"
           class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
         >
           Cancelar Doação
         </button>
-        
+
         <button
+          id="doacao-excluir"
           v-if="podeExcluir"
           @click="$emit('excluir')"
           class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
@@ -202,6 +206,7 @@
                     Código da Transação
                   </label>
                   <input
+                    id="doacao-codigo-transacao"
                     v-model="dadosConfirmacao.codigoTransacao"
                     type="text"
                     required
@@ -213,6 +218,7 @@
                     Método de Pagamento
                   </label>
                   <select
+                    id="doacao-metodo-pagamento"
                     v-model="dadosConfirmacao.metodoPagamento"
                     required
                     class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
@@ -226,12 +232,14 @@
             </div>
             <div class="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
               <button
+                id="doacao-confirmar-submit"
                 type="submit"
                 class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:col-start-2 sm:text-sm"
               >
                 Confirmar
               </button>
               <button
+                id="doacao-confirmar-cancelar"
                 type="button"
                 @click="mostrarModalConfirmacao = false"
                 class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:col-start-1 sm:text-sm"

@@ -16,6 +16,7 @@
         
         <div class="flex items-center space-x-4">
           <BaseButton
+            id="doacao-nova"
             variant="primary"
             @click="abrirModalNovaDoacao"
             data-testid="doacao-nova-button"
