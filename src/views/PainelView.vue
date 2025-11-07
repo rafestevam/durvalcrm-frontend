@@ -233,62 +233,157 @@
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col h-full">
           <!-- Adimplentes -->
           <div class="p-6 border-b border-gray-200 flex-1">
-            <div class="flex items-center justify-between mb-4">
-              <h3 class="text-lg font-semibold text-gray-900">
+            <div class="mb-4">
+              <h3 class="text-lg font-semibold text-gray-900 mb-2">
                 Adimplentes
               </h3>
-              <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
-                {{ dashboardData.adimplentes.length }} associados
-              </span>
+              <p class="text-sm text-gray-600">
+                {{ dashboardData.adimplentes.length }} {{ dashboardData.adimplentes.length === 1 ? 'associado' : 'associados' }}
+              </p>
             </div>
-            <div class="space-y-3 max-h-80 overflow-y-auto">
-              <div v-for="associado in dashboardData.adimplentes.slice(0, 8)" :key="associado.id" class="flex items-center space-x-3">
+
+            <div class="space-y-2 min-h-[320px]">
+              <div v-for="associado in adimplentesPaginados" :key="associado.id" class="flex items-center space-x-2 py-1.5 border-b border-gray-100 last:border-0">
                 <div class="flex-shrink-0">
-                  <div class="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
-                    <CheckIcon class="h-5 w-5 text-green-600" />
-                  </div>
+                  <CheckIcon class="h-4 w-4 text-green-600" />
                 </div>
                 <div class="flex-1 min-w-0">
-                  <p class="text-sm font-medium text-gray-900 truncate">{{ associado.nomeCompleto }}</p>
-                  <p class="text-sm text-gray-500 truncate">{{ associado.email }}</p>
+                  <p class="text-sm text-gray-900 truncate">
+                    <span class="font-medium">{{ associado.nomeCompleto }}</span>
+                    <span class="text-gray-500 ml-1">{{ associado.email }}</span>
+                  </p>
                 </div>
               </div>
-              <p v-if="dashboardData.adimplentes.length > 8" class="text-sm text-gray-500 text-center mt-2">e mais {{ dashboardData.adimplentes.length - 8 }} associados...</p>
+            </div>
+
+            <!-- Paginação -->
+            <div v-if="totalPaginasAdimplentes > 1" class="mt-4 pt-4 border-t border-gray-200">
+              <div class="flex items-center justify-center space-x-2">
+                <button
+                  @click="paginaAdimplentes--"
+                  :disabled="paginaAdimplentes === 1"
+                  :class="[
+                    'px-3 py-1 text-sm font-medium rounded',
+                    paginaAdimplentes === 1
+                      ? 'text-gray-400 cursor-not-allowed'
+                      : 'text-gray-700 hover:bg-gray-100'
+                  ]"
+                >
+                  &lt; Anterior
+                </button>
+
+                <div class="flex items-center space-x-1">
+                  <button
+                    v-for="pagina in paginasVisiveis(totalPaginasAdimplentes, paginaAdimplentes)"
+                    :key="pagina"
+                    @click="paginaAdimplentes = pagina"
+                    :class="[
+                      'px-3 py-1 text-sm font-medium rounded',
+                      paginaAdimplentes === pagina
+                        ? 'bg-green-600 text-white'
+                        : 'text-gray-700 hover:bg-gray-100'
+                    ]"
+                  >
+                    {{ pagina }}
+                  </button>
+                </div>
+
+                <button
+                  @click="paginaAdimplentes++"
+                  :disabled="paginaAdimplentes === totalPaginasAdimplentes"
+                  :class="[
+                    'px-3 py-1 text-sm font-medium rounded',
+                    paginaAdimplentes === totalPaginasAdimplentes
+                      ? 'text-gray-400 cursor-not-allowed'
+                      : 'text-gray-700 hover:bg-gray-100'
+                  ]"
+                >
+                  Próximo &gt;
+                </button>
+              </div>
             </div>
           </div>
 
           <!-- Inadimplentes -->
           <div class="p-6 flex-1">
-            <div class="flex items-center justify-between mb-4">
-              <h3 class="text-lg font-semibold text-gray-900">
+            <div class="mb-4">
+              <h3 class="text-lg font-semibold text-gray-900 mb-2">
                 Inadimplentes
               </h3>
-              <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
-                {{ dashboardData.inadimplentes.length }} associados
-              </span>
+              <p class="text-sm text-gray-600">
+                {{ dashboardData.inadimplentes.length }} {{ dashboardData.inadimplentes.length === 1 ? 'associado' : 'associados' }}
+              </p>
             </div>
-            <div class="space-y-3 max-h-80 overflow-y-auto">
-              <div v-for="associado in dashboardData.inadimplentes.slice(0, 8)" :key="associado.id" class="flex items-center justify-between">
-                <div class="flex items-center space-x-3">
+
+            <div class="space-y-2 min-h-[320px]">
+              <div v-for="associado in inadimplentesPaginados" :key="associado.id" class="flex items-center justify-between py-1.5 border-b border-gray-100 last:border-0">
+                <div class="flex items-center space-x-2 flex-1 min-w-0 mr-3">
                   <div class="flex-shrink-0">
-                    <div class="h-10 w-10 rounded-full bg-red-100 flex items-center justify-center">
-                      <XMarkIcon class="h-5 w-5 text-red-600" />
-                    </div>
+                    <XMarkIcon class="h-4 w-4 text-red-600" />
                   </div>
                   <div class="flex-1 min-w-0">
-                    <p class="text-sm font-medium text-gray-900 truncate">{{ associado.nomeCompleto }}</p>
-                    <p class="text-sm text-gray-500 truncate">{{ associado.email }}</p>
+                    <p class="text-sm text-gray-900 truncate">
+                      <span class="font-medium">{{ associado.nomeCompleto }}</span>
+                      <span class="text-gray-500 ml-1">{{ associado.email }}</span>
+                    </p>
                   </div>
                 </div>
                 <BaseButton
                   variant="secondary"
                   size="sm"
                   @click="gerarCobranca(associado.id)"
+                  class="flex-shrink-0 text-xs px-2 py-1"
                 >
                   Gerar Cobrança
                 </BaseButton>
               </div>
-              <p v-if="dashboardData.inadimplentes.length > 8" class="text-sm text-gray-500 text-center mt-2">e mais {{ dashboardData.inadimplentes.length - 8 }} associados...</p>
+            </div>
+
+            <!-- Paginação -->
+            <div v-if="totalPaginasInadimplentes > 1" class="mt-4 pt-4 border-t border-gray-200">
+              <div class="flex items-center justify-center space-x-2">
+                <button
+                  @click="paginaInadimplentes--"
+                  :disabled="paginaInadimplentes === 1"
+                  :class="[
+                    'px-3 py-1 text-sm font-medium rounded',
+                    paginaInadimplentes === 1
+                      ? 'text-gray-400 cursor-not-allowed'
+                      : 'text-gray-700 hover:bg-gray-100'
+                  ]"
+                >
+                  &lt; Anterior
+                </button>
+
+                <div class="flex items-center space-x-1">
+                  <button
+                    v-for="pagina in paginasVisiveis(totalPaginasInadimplentes, paginaInadimplentes)"
+                    :key="pagina"
+                    @click="paginaInadimplentes = pagina"
+                    :class="[
+                      'px-3 py-1 text-sm font-medium rounded',
+                      paginaInadimplentes === pagina
+                        ? 'bg-red-600 text-white'
+                        : 'text-gray-700 hover:bg-gray-100'
+                    ]"
+                  >
+                    {{ pagina }}
+                  </button>
+                </div>
+
+                <button
+                  @click="paginaInadimplentes++"
+                  :disabled="paginaInadimplentes === totalPaginasInadimplentes"
+                  :class="[
+                    'px-3 py-1 text-sm font-medium rounded',
+                    paginaInadimplentes === totalPaginasInadimplentes
+                      ? 'text-gray-400 cursor-not-allowed'
+                      : 'text-gray-700 hover:bg-gray-100'
+                  ]"
+                >
+                  Próximo &gt;
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -342,6 +437,11 @@ const receitasPorMetodo = ref<ReceitasPorMetodoPagamento>({
 const periodoSelecionado = ref('')
 const loading = ref(false)
 
+// Paginação
+const REGISTROS_POR_PAGINA = 10
+const paginaAdimplentes = ref(1)
+const paginaInadimplentes = ref(1)
+
 // Períodos disponíveis
 const periodosDisponiveis = computed(() => {
   const periodos = []
@@ -382,25 +482,83 @@ function calcularPorcentagem(valor: number): number {
   return Math.round((valor / dadosSegurosDashboard.value.receitaConsolidada) * 100)
 }
 
+// Computed properties para paginação de adimplentes
+const totalPaginasAdimplentes = computed(() => {
+  return Math.ceil(dashboardData.value.adimplentes.length / REGISTROS_POR_PAGINA)
+})
+
+const adimplentesPaginados = computed(() => {
+  const inicio = (paginaAdimplentes.value - 1) * REGISTROS_POR_PAGINA
+  const fim = inicio + REGISTROS_POR_PAGINA
+  return dashboardData.value.adimplentes.slice(inicio, fim)
+})
+
+// Computed properties para paginação de inadimplentes
+const totalPaginasInadimplentes = computed(() => {
+  return Math.ceil(dashboardData.value.inadimplentes.length / REGISTROS_POR_PAGINA)
+})
+
+const inadimplentesPaginados = computed(() => {
+  const inicio = (paginaInadimplentes.value - 1) * REGISTROS_POR_PAGINA
+  const fim = inicio + REGISTROS_POR_PAGINA
+  return dashboardData.value.inadimplentes.slice(inicio, fim)
+})
+
+// Função para gerar array de páginas visíveis
+function paginasVisiveis(totalPaginas: number, paginaAtual: number): number[] {
+  const paginas: number[] = []
+  const maxPaginasVisiveis = 5
+
+  if (totalPaginas <= maxPaginasVisiveis) {
+    // Se tem poucas páginas, mostra todas
+    for (let i = 1; i <= totalPaginas; i++) {
+      paginas.push(i)
+    }
+  } else {
+    // Lógica para mostrar páginas próximas à atual
+    let inicio = Math.max(1, paginaAtual - 2)
+    let fim = Math.min(totalPaginas, paginaAtual + 2)
+
+    // Ajustar se estiver no início
+    if (paginaAtual <= 3) {
+      fim = Math.min(maxPaginasVisiveis, totalPaginas)
+    }
+
+    // Ajustar se estiver no final
+    if (paginaAtual >= totalPaginas - 2) {
+      inicio = Math.max(1, totalPaginas - maxPaginasVisiveis + 1)
+    }
+
+    for (let i = inicio; i <= fim; i++) {
+      paginas.push(i)
+    }
+  }
+
+  return paginas
+}
+
 // Carregar dados do dashboard
 async function carregarDados() {
   try {
     loading.value = true
     const [mes, ano] = periodoSelecionado.value.split('/')
     console.log(`Carregando dados do dashboard para ${mes}/${ano}`)
-    
+
     // Carregar dados do dashboard e receitas por método em paralelo
     const [dados, receitas] = await Promise.all([
       painelService.obterDashboard(parseInt(mes), parseInt(ano)),
       painelService.obterReceitasPorMetodoPagamento()
     ])
-    
+
     console.log('Dados recebidos:', dados)
     console.log('Receitas por método:', receitas)
-    
+
     // Verificar se os dados são válidos antes de atribuir
     if (dados && typeof dados === 'object') {
       dashboardData.value = dados
+      // Resetar páginas para 1 quando novos dados são carregados
+      paginaAdimplentes.value = 1
+      paginaInadimplentes.value = 1
     } else {
       console.error('Dados do dashboard inválidos:', dados)
       dashboardData.value = defaultDashboardData
